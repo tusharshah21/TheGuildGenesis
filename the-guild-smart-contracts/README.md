@@ -55,6 +55,27 @@ $ anvil
 $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 ```
 
+### Deterministic Deployments (CREATE2)
+
+Follow the Foundry guide on deterministic deployments using CREATE2: https://getfoundry.sh/guides/deterministic-deployments-using-create2
+
+We configured `foundry.toml` to pin `solc`, set `evm_version`, and disable metadata hashing for stable bytecode, and enabled `always_use_create_2_factory`.
+
+Use the deploy script with a salt (env var `CREATE2_SALT`) to deploy at a deterministic address:
+
+```shell
+# Example on Sepolia (replace RPC and PK)
+export CREATE2_SALT=1
+forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast
+
+# Use a specific salt value (hex string -> uint)
+export CREATE2_SALT=123456
+forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript --rpc-url <RPC> --private-key <PK> --broadcast
+```
+
 ### Cast
 
 ```shell
