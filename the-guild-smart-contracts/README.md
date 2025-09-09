@@ -87,6 +87,23 @@ forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript --rp
 ### Tokens
 
 - `TheGuildActivityToken` (symbol `TGA`) is an ERC20 with standard 18 decimals. The deployer is the owner and can mint. See `src/TheGuildActivityToken.sol`.
+- The token also acts as an EAS Resolver: it inherits `SchemaResolver` and mints 10 TGA to the attester address on each successful attestation.
+
+#### EAS Resolver behavior (TheGuildActivityToken)
+
+- Inherits `SchemaResolver` and implements:
+  - `onAttest(attestation, value)`: mints `10 * 10^decimals()` to `attestation.attester` and returns `true`.
+  - `onRevoke(...)`: no-op, returns `true`.
+- Constructor requires the global `IEAS` address. Deployment script `script/TheGuildActivityToken.s.sol` auto-selects the EAS address by `chainid` (Base/Optimism/Arbitrum/Polygon, plus testnets) or falls back to `EAS_ADDRESS` env var.
+- To use it as a resolver, set this contract address as the `resolver` when registering your EAS Schema. When EAS processes an attestation for that schema, it will call `attest()` on the resolver, which delegates to `onAttest`.
+- Learn more about EAS resolvers in the official docs: [Resolver Contracts](https://docs.attest.org/docs/core--concepts/resolver-contracts).
+
+Quick steps:
+
+1. Deploy TGA (resolver):
+   - Uses `IEAS` in constructor; see the deploy script for per-chain EAS addresses.
+2. Register your schema in EAS with `resolver` set to the deployed TGA address.
+3. Create attestations against that schema. Each attestation mints 10 TGA to the attester automatically.
 
 Deploy:
 
