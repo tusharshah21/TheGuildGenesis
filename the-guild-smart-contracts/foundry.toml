@@ -11,7 +11,8 @@ cbor_metadata = false
 always_use_create_2_factory = true
 remappings = [
   '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
-  '@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/'
+  '@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/',
+  'eas-contracts/=lib/eas-contracts/contracts/'
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
