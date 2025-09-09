@@ -30,7 +30,7 @@ $ forge build
 OpenZeppelin contracts (for ERC20):
 
 ```shell
-forge install OpenZeppelin/openzeppelin-contracts --no-commit
+forge install OpenZeppelin/openzeppelin-contracts
 ```
 
 ### Test

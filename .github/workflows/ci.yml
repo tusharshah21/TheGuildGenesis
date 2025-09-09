@@ -140,7 +140,7 @@ jobs:
       - name: Install OpenZeppelin
         run: |
           cd the-guild-smart-contracts
-          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+          forge install OpenZeppelin/openzeppelin-contracts
 
       - name: Build contracts
         run: |
