@@ -137,6 +137,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-foundry-
 
+      - name: Install OpenZeppelin
+        run: |
+          cd the-guild-smart-contracts
+          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+
       - name: Build contracts
         run: |
           cd the-guild-smart-contracts

@@ -25,6 +25,14 @@ https://book.getfoundry.sh/
 $ forge build
 ```
 
+### Dependencies
+
+OpenZeppelin contracts (for ERC20):
+
+```shell
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+```
+
 ### Test
 
 ```shell
@@ -74,6 +82,19 @@ forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript \
 # Use a specific salt value (hex string -> uint)
 export CREATE2_SALT=123456
 forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript --rpc-url <RPC> --private-key <PK> --broadcast
+```
+
+### Tokens
+
+- `TheGuildActivityToken` (symbol `TGA`) is an ERC20 with standard 18 decimals. The deployer is the owner and can mint. See `src/TheGuildActivityToken.sol`.
+
+Deploy:
+
+```shell
+forge script script/TheGuildActivityToken.s.sol:TheGuildActivityTokenScript \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast
 ```
 
 ### Cast
