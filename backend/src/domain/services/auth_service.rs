@@ -5,7 +5,7 @@ use crate::domain::value_objects::wallet_address::WalletAddress;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuthChallenge {
     pub nonce: String,
-    pub message: String,
+    pub address: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -19,5 +19,5 @@ pub trait AuthService: Send + Sync {
         &self,
         challenge: &AuthChallenge,
         signature: &str,
-    ) -> Result<AuthResult, Box<dyn std::error::Error>>;
+    ) -> Result<Option<AuthResult>, Box<dyn std::error::Error>>;
 }
