@@ -1,10 +1,15 @@
 ---
-import { Web3ProviderAndApp } from '../components/Web3ProviderAndApp';
+import { AppWrapper } from '@/components/AppWrapper';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="The Guild Genesis">
   <div class="min-h-screen bg-gray-50">
-    <Web3ProviderAndApp client:only="react"/>
+    <AppWrapper client:only="react">
+      <section class="mx-auto max-w-5xl px-4 py-10">
+        <h1 class="mb-6 text-3xl font-bold tracking-tight text-gray-900">The Guild Genesis</h1>
+        <p class="mb-8 max-w-2xl text-gray-600">The Guild Genesis is a peer-run organization for software developers.</p>
+      </section>
+    </AppWrapper>
   </div>
 </Layout>
