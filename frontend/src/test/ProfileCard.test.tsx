@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { ProfileCard } from "../components/ProfileCard";
+import { ProfileCard } from "../components/profiles/ProfileCard";
 
 describe("ProfileCard", () => {
   it("renders minimal profile and badge count", () => {
