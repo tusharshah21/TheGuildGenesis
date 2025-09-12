@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -8,10 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateProfile } from "@/hooks/use-create-profile";
 import {
   Form,
   FormControl,
@@ -23,28 +20,44 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUpdateProfile } from "@/hooks/use-update-profile";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  description: z.string().optional(),
-  siweMessage: z.string().min(1, { message: "Message to sign is required." }),
-});
+interface EditProfileDialogProps {
+  address: string;
+  name?: string;
+  description?: string;
+  children: React.ReactNode;
+}
 
-type FormValues = z.infer<typeof formSchema>;
-
-export function CreateProfileButton() {
+export function EditProfileDialog({
+  address,
+  name,
+  description,
+  children,
+}: EditProfileDialogProps) {
   const [open, setOpen] = useState(false);
-  const createProfile = useCreateProfile();
+  const updateProfile = useUpdateProfile();
   const queryClient = useQueryClient();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", description: "", siweMessage: "LOGIN_NONCE" },
+  const form = useForm<{
+    name: string;
+    description?: string;
+  }>({
+    resolver: zodResolver(
+      z.object({
+        name: z
+          .string()
+          .min(2, { message: "Name must be at least 2 characters." }),
+        description: z.string().optional(),
+      })
+    ),
+    defaultValues: { name: name || "", description: description || "" },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    await createProfile.mutateAsync({
+  const onSubmit = async (values: { name: string; description?: string }) => {
+    await updateProfile.mutateAsync({
       input: {
         name: values.name,
         description: values.description || "",
@@ -53,22 +66,16 @@ export function CreateProfileButton() {
     });
     await queryClient.invalidateQueries({ queryKey: ["profiles"] });
     setOpen(false);
-    form.reset();
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Create Profile</span>
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Profile</DialogTitle>
+          <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Provide a name and an optional description for your profile.
+            Update your profile information.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -105,13 +112,13 @@ export function CreateProfileButton() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={createProfile.isPending}>
-                {createProfile.isPending ? "Creating..." : "Create"}
+              <Button type="submit" disabled={updateProfile.isPending}>
+                {updateProfile.isPending ? "Updating..." : "Update"}
               </Button>
             </div>
-            {createProfile.isError ? (
+            {updateProfile.isError ? (
               <p className="text-sm text-red-600">
-                {(createProfile.error as Error).message}
+                {(updateProfile.error as Error).message}
               </p>
             ) : null}
           </form>
@@ -121,4 +128,4 @@ export function CreateProfileButton() {
   );
 }
 
-export default CreateProfileButton;
+export default EditProfileDialog;
