@@ -1,15 +1,11 @@
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
+import { useAccount, useSignMessage } from "wagmi";
 
 export type CreateProfileInput = {
   name: string;
   description?: string;
   avatar_url?: string;
-};
-
-export type CreateProfileHeaders = {
-  ethAddress: string; // 0x...
-  ethSignature: string; // signature hex string
-  siweMessage: string; // SIWE message or nonce
+  siweMessage: string; // message to sign for auth
 };
 
 // Unknown response shape from backend; expose as unknown for consumers to refine
@@ -20,15 +16,16 @@ const API_BASE_URL: string =
 
 async function postCreateProfile(
   input: CreateProfileInput,
-  headers: CreateProfileHeaders
+  address: string,
+  signature: string
 ): Promise<CreateProfileResponse> {
   const response = await fetch(`${API_BASE_URL}/profiles/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-eth-address": headers.ethAddress,
-      "x-eth-signature": headers.ethSignature,
-      "x-siwe-message": headers.siweMessage,
+      "x-eth-address": address,
+      "x-eth-signature": signature,
+      "x-siwe-message": input.siweMessage,
     },
     body: JSON.stringify(input),
   });
@@ -52,7 +49,6 @@ async function postCreateProfile(
 
 type MutationVariables = {
   input: CreateProfileInput;
-  headers: CreateProfileHeaders;
 };
 
 export function useCreateProfile(): UseMutationResult<
@@ -60,8 +56,17 @@ export function useCreateProfile(): UseMutationResult<
   Error,
   MutationVariables
 > {
+  const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+
   return useMutation<CreateProfileResponse, Error, MutationVariables>({
     mutationKey: ["create-profile"],
-    mutationFn: async ({ input, headers }) => postCreateProfile(input, headers),
+    mutationFn: async ({ input }) => {
+      if (!address) {
+        throw new Error("Wallet not connected");
+      }
+      const signature = await signMessageAsync({ message: input.siweMessage });
+      return postCreateProfile(input, address, signature);
+    },
   });
 }

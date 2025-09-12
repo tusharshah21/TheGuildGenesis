@@ -27,6 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   description: z.string().optional(),
+  siweMessage: z.string().min(1, { message: "Message to sign is required." }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -37,7 +38,7 @@ export function CreateProfileButton() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", description: "" },
+    defaultValues: { name: "", description: "", siweMessage: "LOGIN_NONCE" },
   });
 
   const onSubmit = async (values: FormValues) => {
@@ -45,10 +46,6 @@ export function CreateProfileButton() {
       input: {
         name: values.name,
         description: values.description || "",
-      },
-      headers: {
-        ethAddress: "0x2581aAa94299787a8A588B2Fceb161A302939E28",
-        ethSignature: "0x00000000000000",
         siweMessage: "LOGIN_NONCE",
       },
     });
