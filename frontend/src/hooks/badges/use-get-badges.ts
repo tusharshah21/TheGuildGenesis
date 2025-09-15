@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useReadContract, useReadContracts } from "wagmi";
 import type { Address } from "viem";
+import { badgeRegistryAbi } from "@/lib/abis/badgeRegistryAbi";
 
 export type Badge = {
   name: string;
@@ -9,28 +10,6 @@ export type Badge = {
 
 const BADGE_REGISTRY_ADDRESS = (import.meta.env.PUBLIC_BADGE_REGISTRY_ADDRESS ||
   "") as Address;
-
-// ABI fragments for the required contract read methods
-const badgeRegistryAbi = [
-  {
-    type: "function",
-    name: "totalBadges",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
-  },
-  {
-    type: "function",
-    name: "getBadgeAt",
-    stateMutability: "view",
-    inputs: [{ name: "index", type: "uint256" }],
-    outputs: [
-      { name: "", type: "bytes32" },
-      { name: "", type: "bytes32" },
-      { name: "", type: "address" },
-    ],
-  },
-] as const;
 
 function bytes32ToString(value: `0x${string}`): string {
   try {
@@ -56,6 +35,7 @@ export function useGetBadges(): {
   data: Badge[] | undefined;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 } {
   const address = BADGE_REGISTRY_ADDRESS;
 
@@ -67,6 +47,7 @@ export function useGetBadges(): {
       enabled: Boolean(address),
     },
   });
+  console.log("totalBadgesQuery", totalBadgesQuery.data);
 
   const count = Number((totalBadgesQuery.data as bigint | undefined) ?? 0n);
 
@@ -109,5 +90,5 @@ export function useGetBadges(): {
     (badgesQuery.error as Error | null) ||
     null;
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch: totalBadgesQuery.refetch };
 }
