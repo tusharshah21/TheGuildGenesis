@@ -71,4 +71,14 @@ contract TheGuildBadgeRegistry {
     function badgeNameAt(uint256 index) external view returns (bytes32) {
         return badgeNames[index];
     }
+
+    /// @notice Get a badge at a specific index for enumeration.
+    /// @dev Reverts if index is out of bounds.
+    function getBadgeAt(
+        uint256 index
+    ) external view returns (bytes32, bytes32, address) {
+        bytes32 name = badgeNames[index];
+        Badge memory b = nameToBadge[name];
+        return (b.name, b.description, b.creator);
+    }
 }

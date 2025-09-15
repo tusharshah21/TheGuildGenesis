@@ -9,8 +9,8 @@ export function BadgesPage() {
           Badges
         </h1>
         <p className="mb-8 max-w-2xl text-gray-600">
-          Explore community badges. These are separate from profile badges and
-          represent different achievements within The Guild Genesis.
+          Explore community badges. These can be created by anyone. Anyone can
+          send you an attestation of a badge on your profile.
         </p>
         <BadgesList />
       </section>

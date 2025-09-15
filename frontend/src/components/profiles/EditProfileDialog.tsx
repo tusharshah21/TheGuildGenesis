@@ -20,7 +20,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUpdateProfile } from "@/hooks/use-update-profile";
+import { useUpdateProfile } from "@/hooks/profiles/use-update-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 

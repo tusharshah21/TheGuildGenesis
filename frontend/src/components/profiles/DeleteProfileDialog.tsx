@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useDeleteProfile } from "@/hooks/use-delete-profile";
+import { useDeleteProfile } from "@/hooks/profiles/use-delete-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, BadgeCheck } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
 import {
   Card,
@@ -8,41 +8,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-type Badge = {
-  name: string;
-  description: string;
-};
-
-const HARD_CODED_BADGES: Badge[] = [
-  {
-    name: "Open Source Contributor",
-    description: "Contributed code to The Guild Genesis repositories.",
-  },
-  {
-    name: "Smart Contract Deployer",
-    description:
-      "Successfully deployed a smart contract to testnet or mainnet.",
-  },
-  {
-    name: "Community Mentor",
-    description: "Helped onboard and mentor new members of the community.",
-  },
-  {
-    name: "Bug Hunter",
-    description:
-      "Reported and helped resolve significant issues or vulnerabilities.",
-  },
-  {
-    name: "Docs Champion",
-    description: "Improved documentation or tutorials for the project.",
-  },
-];
+import { useGetBadges } from "@/hooks/badges/use-get-badges";
+import { HARD_CODED_BADGES, type Badge } from "@/lib/constants/badgeConstants";
 
 export function BadgesList(): React.ReactElement {
+  const { data, isLoading } = useGetBadges();
+  const list = (data && data.length > 0 ? data : HARD_CODED_BADGES) as Badge[];
+
+  if (isLoading) {
+    return <div className="mx-auto w-full max-w-5xl p-4">Loading badges…</div>;
+  }
   return (
     <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {HARD_CODED_BADGES.map((badge) => (
+      {list.map((badge) => (
         <Card key={badge.name}>
           <CardHeader>
             <CardTitle>

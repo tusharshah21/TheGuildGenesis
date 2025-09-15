@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCreateProfile } from "@/hooks/use-create-profile";
+import { useCreateProfile } from "@/hooks/profiles/use-create-profile";
 import {
   Form,
   FormControl,
