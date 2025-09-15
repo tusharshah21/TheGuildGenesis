@@ -3,9 +3,8 @@ use axum::{extract::State, http::StatusCode, Extension, Json};
 use crate::{
     application::{
         commands::{
-            create_profile::create_profile, get_profile::get_profile,
-            get_all_profiles::get_all_profiles,
-            update_profile::update_profile,
+            create_profile::create_profile, get_all_profiles::get_all_profiles,
+            get_profile::get_profile, update_profile::update_profile,
         },
         dtos::{CreateProfileRequest, ProfileResponse, UpdateProfileRequest},
     },
@@ -32,9 +31,7 @@ pub async fn get_profile_handler(
     Json(get_profile(state.profile_repository, wallet).await.unwrap())
 }
 
-pub async fn get_all_profiles_handler(
-    State(state): State<AppState>,
-) -> Json<Vec<ProfileResponse>> {
+pub async fn get_all_profiles_handler(State(state): State<AppState>) -> Json<Vec<ProfileResponse>> {
     Json(get_all_profiles(state.profile_repository).await.unwrap())
 }
 

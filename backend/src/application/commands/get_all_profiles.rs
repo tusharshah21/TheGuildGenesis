@@ -9,14 +9,16 @@ pub async fn get_all_profiles(
         .find_all()
         .await
         .map_err(|e| e.to_string())?;
-    
 
-    Ok(profiles.into_iter().map(|profile| ProfileResponse {
-        address: profile.address,
-        name: profile.name.unwrap_or_default(),
-        description: profile.description,
-        avatar_url: profile.avatar_url,
-        created_at: profile.created_at,
-        updated_at: profile.updated_at,
-    }).collect())
+    Ok(profiles
+        .into_iter()
+        .map(|profile| ProfileResponse {
+            address: profile.address,
+            name: profile.name.unwrap_or_default(),
+            description: profile.description,
+            avatar_url: profile.avatar_url,
+            created_at: profile.created_at,
+            updated_at: profile.updated_at,
+        })
+        .collect())
 }
