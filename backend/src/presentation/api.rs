@@ -10,7 +10,7 @@ use axum::middleware::from_fn_with_state;
 use axum::{
     extract::DefaultBodyLimit,
     http::Method,
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
     Router,
 };
 use tower::ServiceBuilder;
@@ -19,7 +19,10 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-use super::handlers::{create_profile_handler, get_profile_handler, get_all_profiles_handler, update_profile_handler};
+use super::handlers::{
+    create_profile_handler, delete_profile_handler, get_profile_handler, get_all_profiles_handler, update_profile_handler,
+};
+
 use super::middlewares::eth_auth_layer;
 
 pub async fn create_app(pool: sqlx::PgPool) -> Router {
@@ -34,6 +37,7 @@ pub async fn create_app(pool: sqlx::PgPool) -> Router {
     let protected = Router::new()
         .route("/profiles/", post(create_profile_handler))
         .route("/profiles/:address", put(update_profile_handler))
+        .route("/profiles/:address", delete(delete_profile_handler));
         .with_state(state.clone())
         .layer(from_fn_with_state(state.clone(), eth_auth_layer));
 
