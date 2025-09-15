@@ -3,9 +3,11 @@ import { Search } from "lucide-react";
 import { CreateProfileButton } from "./CreateProfileButton";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
 import { PROFILES, type Profile } from "@/lib/constants/profileConstants";
+import { useMemo, useState } from "react";
 
 export function ProfilesList() {
   const { data, isLoading, error } = useGetProfiles();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const profiles: Profile[] =
     data && data.length > 0
@@ -18,6 +20,12 @@ export function ProfilesList() {
         }))
       : PROFILES;
 
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return profiles;
+    return profiles.filter((p) => (p.name || "").toLowerCase().includes(q));
+  }, [profiles, searchQuery]);
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex gap-4 items-center pb-8">
@@ -27,6 +35,8 @@ export function ProfilesList() {
             type="text"
             placeholder="Search profiles..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -41,7 +51,7 @@ export function ProfilesList() {
       ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {profiles.map((profile) => (
+        {filtered.map((profile) => (
           <ProfileCard
             key={profile.address}
             address={profile.address}
