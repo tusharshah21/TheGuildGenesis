@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { BadgeCheck } from "lucide-react";
 
 import {
@@ -15,7 +15,14 @@ import { CreateBadgeButton } from "@/components/badges/CreateBadgeButton";
 
 export function BadgesList(): React.ReactElement {
   const { data, isLoading } = useGetBadges();
+  const [searchQuery, setSearchQuery] = useState("");
   const list = (data && data.length > 0 ? data : HARD_CODED_BADGES) as Badge[];
+
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return list;
+    return list.filter((b) => b.name.toLowerCase().includes(q));
+  }, [list, searchQuery]);
 
   if (isLoading) {
     return <div className="mx-auto w-full max-w-5xl p-4">Loading badges…</div>;
@@ -29,6 +36,8 @@ export function BadgesList(): React.ReactElement {
             type="text"
             placeholder="Search badges..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -36,7 +45,7 @@ export function BadgesList(): React.ReactElement {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {list.map((badge) => (
+        {filtered.map((badge) => (
           <Card key={badge.name}>
             <CardHeader>
               <CardTitle>
