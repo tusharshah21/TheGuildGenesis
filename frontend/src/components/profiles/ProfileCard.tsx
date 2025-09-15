@@ -1,4 +1,4 @@
-import { Badge, Award, User, Edit } from "lucide-react";
+import { Badge, Award, User, Edit, Trash } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { EditProfileDialog } from "./EditProfileDialog";
 import { useAccount } from "wagmi";
+import DeleteProfileDialog from "./DeleteProfileDialog";
 
 interface ProfileCardProps {
   address: string;
@@ -114,6 +115,18 @@ export function ProfileCard({
               </span>
             )}
           </div>
+        )}
+        {isOwner && (
+          <DeleteProfileDialog>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="absolute bottom-2 right-2 h-8 w-8 p-0"
+              aria-label="Delete profile"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </DeleteProfileDialog>
         )}
       </CardContent>
     </Card>

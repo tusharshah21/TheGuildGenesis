@@ -93,7 +93,10 @@ export function CreateProfileButton() {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Hello world" {...field} />
+                    <Input
+                      placeholder="Write a short introduction..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

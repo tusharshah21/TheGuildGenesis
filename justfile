@@ -16,7 +16,7 @@ dev-frontend:
 # Start backend development server
 dev-backend:
     @echo "🦀 Starting Rust backend..."
-    cd backend && cargo run --bin guild-backend-dev
+    cd backend && cargo run --bin guild-backend
 
 # Install all dependencies
 install-all:
