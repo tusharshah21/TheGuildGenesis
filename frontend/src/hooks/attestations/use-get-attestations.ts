@@ -1,73 +1,10 @@
 import { useMemo } from "react";
 import { useReadContract, useReadContracts } from "wagmi";
-import type { Address } from "viem";
 import { decodeAbiParameters } from "viem";
-
-export type AttestationItem = {
-  issuer: string;
-  recipient: string;
-  badgeName: string;
-  attestationJustification: string;
-};
-
-const ACTIVITY_TOKEN_ADDRESS = (import.meta.env.PUBLIC_ACTIVITY_TOKEN_ADDRESS ||
-  "") as Address;
-
-// Minimal ABI fragments we need from TheGuildActivityToken / EAS
-const activityTokenAbi = [
-  {
-    type: "function",
-    name: "getAttestationCount",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
-  },
-  {
-    type: "function",
-    name: "getAttestationAtIndex",
-    stateMutability: "view",
-    inputs: [{ name: "index", type: "uint256" }],
-    outputs: [
-      {
-        name: "",
-        type: "tuple",
-        components: [
-          { name: "uid", type: "bytes32" },
-          { name: "schema", type: "bytes32" },
-          { name: "time", type: "uint64" },
-          { name: "expirationTime", type: "uint64" },
-          { name: "revocationTime", type: "uint64" },
-          { name: "refUID", type: "bytes32" },
-          { name: "recipient", type: "address" },
-          { name: "attester", type: "address" },
-          { name: "revocable", type: "bool" },
-          { name: "data", type: "bytes" },
-          { name: "bump", type: "uint32" },
-        ],
-      },
-    ],
-  },
-] as const;
-
-function bytes32ToString(value: `0x${string}`): string {
-  try {
-    // viem utils: to strip null bytes and decode
-    const bytes = new TextDecoder();
-    // fallback simple decode by removing trailing zeros and interpreting as utf8
-    // Convert hex to Uint8Array
-    const hex = value.startsWith("0x") ? value.slice(2) : value;
-    const arr = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < arr.length; i++) {
-      arr[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-    }
-    // Trim trailing zeros
-    let end = arr.length;
-    while (end > 0 && arr[end - 1] === 0) end--;
-    return bytes.decode(arr.subarray(0, end));
-  } catch (_e) {
-    return "";
-  }
-}
+import { activityTokenAbi } from "@/lib/abis/activityTokenAbi";
+import { ACTIVITY_TOKEN_ADDRESS } from "@/lib/constants/blockchainConstants";
+import { bytes32ToString } from "@/lib/utils/blockchainUtils";
+import type { AttestationItem } from "@/lib/types/attestation";
 
 function tryDecodeBadgeData(data: `0x${string}` | null | undefined): {
   badgeName: string;

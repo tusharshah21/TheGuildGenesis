@@ -1,26 +1,8 @@
 import { useMemo } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import type { Address } from "viem";
+import { BADGE_REGISTRY_ADDRESS } from "@/lib/constants/blockchainConstants";
 import { badgeRegistryAbi } from "@/lib/abis/badgeRegistryAbi";
-
-const BADGE_REGISTRY_ADDRESS = (import.meta.env.PUBLIC_BADGE_REGISTRY_ADDRESS ||
-  "") as Address;
-
-function stringToBytes32(value: string): `0x${string}` {
-  // Encode to utf8, pad/truncate to 32 bytes, return as hex
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(value);
-  const out = new Uint8Array(32);
-  const len = Math.min(32, bytes.length);
-  for (let i = 0; i < len; i++) out[i] = bytes[i];
-  // Convert to hex
-  let hex = "0x";
-  for (let i = 0; i < out.length; i++) {
-    const h = out[i].toString(16).padStart(2, "0");
-    hex += h;
-  }
-  return hex as `0x${string}`;
-}
+import { stringToBytes32 } from "@/lib/utils/blockchainUtils";
 
 export function useCreateBadge() {
   const { writeContractAsync, isPending, error, data, reset } =

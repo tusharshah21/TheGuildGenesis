@@ -1,45 +1,11 @@
 import { useMemo } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { encodeAbiParameters } from "viem";
-import type { Address } from "viem";
-
-const EAS_CONTRACT_ADDRESS = (import.meta.env.PUBLIC_EAS_CONTRACT_ADDRESS ||
-  "0xC2679fBD37d54388Ce493F1DB75320D236e1815e") as Address; // Sepolia default
-
-const SCHEMA_ID = (import.meta.env.PUBLIC_SCHEMA_ID ||
-  "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef") as `0x${string}`;
-
-// Minimal EAS ABI for `attest((bytes32,(address,uint64,uint64?,bool,bytes32,bytes,uint256)))`.
-// Using the 1.4.0 signature from IEAS: attest((bytes32 schema, (address recipient, uint64 expirationTime, bool revocable, bytes32 refUID, bytes data, uint256 value) data))
-const easAbi = [
-  {
-    type: "function",
-    name: "attest",
-    stateMutability: "payable",
-    inputs: [
-      {
-        name: "request",
-        type: "tuple",
-        components: [
-          { name: "schema", type: "bytes32" },
-          {
-            name: "data",
-            type: "tuple",
-            components: [
-              { name: "recipient", type: "address" },
-              { name: "expirationTime", type: "uint64" },
-              { name: "revocable", type: "bool" },
-              { name: "refUID", type: "bytes32" },
-              { name: "data", type: "bytes" },
-              { name: "value", type: "uint256" },
-            ],
-          },
-        ],
-      },
-    ],
-    outputs: [{ name: "uid", type: "bytes32" }],
-  },
-] as const;
+import { easAbi } from "@/lib/abis/easAbi";
+import {
+  EAS_CONTRACT_ADDRESS,
+  SCHEMA_ID,
+} from "@/lib/constants/blockchainConstants";
 
 function stringToBytes32(value: string): `0x${string}` {
   const encoder = new TextEncoder();

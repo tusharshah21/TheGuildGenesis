@@ -1,18 +1,8 @@
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { useAccount, useSignMessage } from "wagmi";
-
-export type CreateProfileInput = {
-  name: string;
-  description?: string;
-  avatar_url?: string;
-  siweMessage: string; // message to sign for auth
-};
-
-// Unknown response shape from backend; expose as unknown for consumers to refine
-export type CreateProfileResponse = unknown;
-
-const API_BASE_URL: string =
-  import.meta.env.PUBLIC_API_URL || "http://0.0.0.0:3001";
+import type { CreateProfileInput } from "@/lib/types/api";
+import type { CreateProfileResponse } from "@/lib/types/api";
+import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
 async function postCreateProfile(
   input: CreateProfileInput,

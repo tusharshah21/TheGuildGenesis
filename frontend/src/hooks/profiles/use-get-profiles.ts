@@ -1,18 +1,8 @@
+import type { ProfileFromAPI } from "@/lib/types/profiles";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
-export type Profile = {
-  address: string;
-  name?: string;
-  description?: string;
-  avatar_url?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-const API_BASE_URL: string =
-  import.meta.env.PUBLIC_API_URL || "http://0.0.0.0:3001";
-
-async function fetchProfiles(): Promise<Profile[]> {
+async function fetchProfiles(): Promise<ProfileFromAPI[]> {
   const response = await fetch(`${API_BASE_URL}/profiles/`, {
     method: "GET",
     headers: {
@@ -29,11 +19,11 @@ async function fetchProfiles(): Promise<Profile[]> {
     );
   }
 
-  return (await response.json()) as Profile[];
+  return (await response.json()) as ProfileFromAPI[];
 }
 
-export function useGetProfiles(): UseQueryResult<Profile[], Error> {
-  return useQuery<Profile[], Error>({
+export function useGetProfiles(): UseQueryResult<ProfileFromAPI[], Error> {
+  return useQuery<ProfileFromAPI[], Error>({
     queryKey: ["profiles"],
     queryFn: fetchProfiles,
   });

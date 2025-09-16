@@ -1,14 +1,10 @@
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { useAccount, useSignMessage } from "wagmi";
-
-export type DeleteProfileInput = {
-  siweMessage: string;
-};
-
-export type DeleteProfileResponse = unknown;
-
-const API_BASE_URL: string =
-  import.meta.env.PUBLIC_API_URL || "http://0.0.0.0:3001";
+import type {
+  DeleteProfileInput,
+  DeleteProfileResponse,
+} from "@/lib/types/api";
+import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
 async function deleteProfile(
   address: string,

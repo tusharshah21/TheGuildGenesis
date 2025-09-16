@@ -1,3 +1,5 @@
+import type { Badge } from "../types/badges";
+
 export const HARD_CODED_BADGES: Badge[] = [
   {
     name: "Open Source Contributor",
@@ -22,7 +24,3 @@ export const HARD_CODED_BADGES: Badge[] = [
     description: "Improved documentation or tutorials for the project.",
   },
 ];
-export type Badge = {
-  name: string;
-  description: string;
-};

@@ -1,17 +1,4 @@
-type ProfileAttestation = {
-  id: string;
-  badgeName: string;
-  justification: string;
-  issuer: string;
-};
-
-export type Profile = {
-  address: string;
-  name?: string;
-  description?: string;
-  attestationCount: number;
-  attestations: ProfileAttestation[];
-};
+import type { Profile } from "../types/profiles";
 
 export const PROFILES: Profile[] = [
   {

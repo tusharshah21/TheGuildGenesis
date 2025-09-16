@@ -1,17 +1,10 @@
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { useAccount, useSignMessage } from "wagmi";
-
-export type UpdateProfileInput = {
-  name?: string;
-  description?: string;
-  avatar_url?: string;
-  siweMessage: string;
-};
-
-export type UpdateProfileResponse = unknown;
-
-const API_BASE_URL: string =
-  import.meta.env.PUBLIC_API_URL || "http://0.0.0.0:3001";
+import type {
+  UpdateProfileInput,
+  UpdateProfileResponse,
+} from "@/lib/types/api";
+import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
 async function putUpdateProfile(
   address: string,

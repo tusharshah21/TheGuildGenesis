@@ -1,10 +1,12 @@
 import { ProfileCard } from "./ProfileCard";
 import { Search } from "lucide-react";
-import { CreateProfileButton } from "./CreateProfileButton";
+import { CreateProfileButton } from "./CreateProfileDialog";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
-import { PROFILES, type Profile } from "@/lib/constants/profileConstants";
+import { PROFILES } from "@/lib/constants/profileConstants";
+import type { Profile } from "@/lib/types/profiles";
 import { useMemo, useState } from "react";
 import { useGetAttestations } from "@/hooks/attestations/use-get-attestations";
+import { Input } from "../ui/input";
 
 export function ProfilesList() {
   const { data, isLoading, error } = useGetProfiles();
@@ -65,10 +67,10 @@ export function ProfilesList() {
       <div className="flex gap-4 items-center pb-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
+          <Input
             type="text"
             placeholder="Search profiles..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
