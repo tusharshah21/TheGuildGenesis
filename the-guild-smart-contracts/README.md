@@ -19,16 +19,16 @@ For detailed frontend integration instructions, see [INTEGRATION.md](./INTEGRATI
 
 ### Amoy 
 
-Salt: "theguild2"
+Salt: "theguild_v_0.1.0"
 
 TheGuildActivityToken
-https://amoy.polygonscan.com/address/0x5a79Dd0F66E2C1203948dD49634E506b3D8723A0 
+https://amoy.polygonscan.com/address/0x5f0a5293e33af3806ed34ba7dc139c8d3c39f310 
 
 TheGuildBadgeRegistry
-https://amoy.polygonscan.com/address/0x8baA0d5135D241bd22a9eB35915300aCfB286307 
+https://amoy.polygonscan.com/address/0x7e67100ce4bc2640f50c47d2dd3eebc749d8f52e 
 
 EAS Schema ID:
-0x6228d4b9508624b41476a77a09b7582ddc056b92a725f645df6e337be113c9b1
+0x7b0ac75049ac0cf0a8f6606194f9ff2b892bed81560a7d84d484f96c788042cc
 
 ## Foundry Usage
 

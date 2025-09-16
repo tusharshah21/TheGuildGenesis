@@ -1,0 +1,17 @@
+---
+import ProfilePage from "@/components/pages/ProfilePage";
+import Layout from "@/layouts/Layout.astro";
+
+const { address } = Astro.params;
+
+export const prerender = false;
+---
+
+
+
+<Layout title="Profile - The Guild Genesis">
+  <div class="min-h-screen bg-gray-50">
+    <ProfilePage address={address as string} client:only="react" />
+  </div>
+</Layout>
+  

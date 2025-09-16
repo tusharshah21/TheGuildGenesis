@@ -13,7 +13,7 @@ import {console} from "forge-std/console.sol";
 contract FullDeploymentScript is Script {
     function run() public {
         EAS eas;
-        bytes32 salt = bytes32("theguild2");
+        bytes32 salt = bytes32("theguild_v_0.1.0");
         // EAS addresses per https://github.com/ethereum-attestation-service/eas-contracts deployments
         // Base mainnet (8453) and Base Goerli/Sepolia (84531/84532) use the canonical predeploy 0x...21
         // Optimism mainnet (10) and OP Sepolia (11155420) also use canonical 0x...21
@@ -73,7 +73,8 @@ contract FullDeploymentScript is Script {
 
         // Create some attestations
         AttestationRequestData memory data = AttestationRequestData({
-            recipient: address(0x1234),
+            // TheGuild test account
+            recipient: address(0x6cfD0753EC4da15Dcb418E11e921C0665c1d1cBf),
             expirationTime: 0,
             revocable: true,
             refUID: bytes32(0),
