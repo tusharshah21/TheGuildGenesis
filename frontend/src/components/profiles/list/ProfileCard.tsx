@@ -7,10 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EditProfileDialog } from "./EditProfileDialog";
+import { EditProfileDialog } from "../action-buttons/EditProfileDialog";
 import { useAccount } from "wagmi";
-import DeleteProfileDialog from "./DeleteProfileDialog";
-import { AddAttestationDialog } from "./AddAttestationDialog";
+import DeleteProfileDialog from "../action-buttons/DeleteProfileDialog";
+import { AddAttestationDialog } from "../action-buttons/AddAttestationDialog";
 
 interface ProfileCardProps {
   address: string;
@@ -46,20 +46,28 @@ export function ProfileCard({
       }`}
     >
       <CardHeader className="flex flex-row items-start gap-4">
-        {avatar ? (
-          <img
-            src={avatar}
-            alt={displayName}
-            className="h-12 w-12 rounded-full object-cover"
-          />
-        ) : (
-          <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-            <User className="h-6 w-6 text-gray-400" />
-          </div>
-        )}
+        <a
+          href={`/profiles/${address}`}
+          className="shrink-0"
+          aria-label={`View ${displayName}`}
+        >
+          {avatar ? (
+            <img
+              src={avatar}
+              alt={displayName}
+              className="h-12 w-12 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+              <User className="h-6 w-6 text-gray-400" />
+            </div>
+          )}
+        </a>
         <div className="min-w-0 flex-1">
           <CardTitle className="truncate text-lg flex items-center gap-2">
-            {displayName}
+            <a href={`/profiles/${address}`} className="hover:underline">
+              {displayName}
+            </a>
             {isOwner && (
               <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
                 You
@@ -67,7 +75,9 @@ export function ProfileCard({
             )}
           </CardTitle>
           <CardDescription className="font-mono">
-            {displayAddress}
+            <a href={`/profiles/${address}`} className="hover:underline">
+              {displayAddress}
+            </a>
           </CardDescription>
         </div>
         {isOwner && (

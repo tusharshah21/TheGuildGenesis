@@ -1,5 +1,5 @@
 import { AppWrapper } from "@/components/AppWrapper";
-import ProfilesList from "@/components/profiles/ProfilesList";
+import ProfilesList from "@/components/profiles/list/ProfilesList";
 
 export function ProfilesPage() {
   return (

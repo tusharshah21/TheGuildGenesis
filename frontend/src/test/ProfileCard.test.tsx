@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { ProfileCard } from "../components/profiles/ProfileCard";
+import { ProfileCard } from "../components/profiles/list/ProfileCard";
 import React from "react";
 
 // Mock window.matchMedia

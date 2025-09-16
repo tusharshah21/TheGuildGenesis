@@ -1,12 +1,12 @@
 import { ProfileCard } from "./ProfileCard";
 import { Search } from "lucide-react";
-import { CreateProfileButton } from "./CreateProfileDialog";
+import { CreateProfileButton } from "../action-buttons/CreateProfileDialog";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
 import { PROFILES } from "@/lib/constants/profileConstants";
 import type { Profile } from "@/lib/types/profiles";
 import { useMemo, useState } from "react";
 import { useGetAttestations } from "@/hooks/attestations/use-get-attestations";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 
 export function ProfilesList() {
   const { data, isLoading, error } = useGetProfiles();
