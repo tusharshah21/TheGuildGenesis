@@ -25,6 +25,10 @@ vi.mock("wagmi", () => ({
   ),
   useAccount: () => ({ address: undefined }),
   useSignMessage: () => ({ signMessageAsync: vi.fn() }),
+  useWriteContract: () => ({ writeContractAsync: vi.fn() }),
+  useWaitForTransactionReceipt: () => ({ data: vi.fn() }),
+  useReadContract: () => ({ data: undefined }),
+  useReadContracts: () => ({ data: undefined }),
 }));
 
 // Mock RainbowKit
@@ -46,18 +50,18 @@ describe("ProfileCard", () => {
     render(
       <ProfileCard
         address="0x1234567890123456789012345678901234567890"
-        badgeCount={2}
-        badges={[
+        attestationCount={2}
+        attestations={[
           {
             id: "1",
-            name: "Rust",
-            description: "Rust programming",
+            badgeName: "Rust",
+            justification: "Rust programming",
             issuer: "0xabcd",
           },
           {
             id: "2",
-            name: "React",
-            description: "React development",
+            badgeName: "React",
+            justification: "React development",
             issuer: "0xefgh",
           },
         ]}
@@ -66,7 +70,7 @@ describe("ProfileCard", () => {
 
     // Name falls back to truncated address, and the address appears in description line too
     expect(screen.getAllByText("0x1234...7890").length).toBeGreaterThan(0);
-    expect(screen.getByText("2 badges")).toBeInTheDocument();
+    expect(screen.getByText("2 attestations")).toBeInTheDocument();
     expect(screen.getByText("Rust")).toBeInTheDocument();
     expect(screen.getByText("React")).toBeInTheDocument();
   });
