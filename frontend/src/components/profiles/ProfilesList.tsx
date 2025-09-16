@@ -4,21 +4,55 @@ import { CreateProfileButton } from "./CreateProfileButton";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
 import { PROFILES, type Profile } from "@/lib/constants/profileConstants";
 import { useMemo, useState } from "react";
+import { useGetAttestations } from "@/hooks/attestations/use-get-attestations";
 
 export function ProfilesList() {
   const { data, isLoading, error } = useGetProfiles();
   const [searchQuery, setSearchQuery] = useState("");
+  const attestations = useGetAttestations();
 
-  const profiles: Profile[] =
+  const baseProfiles: Profile[] =
     data && data.length > 0
       ? data.map((p) => ({
           address: p.address,
           name: p.name,
           description: p.description,
-          badgeCount: 0,
-          badges: [],
+          attestationCount: 0,
+          attestations: [],
         }))
       : PROFILES;
+
+  const attestationsByRecipient = useMemo(() => {
+    const map = new Map<
+      string,
+      { id: string; badgeName: string; justification: string; issuer: string }[]
+    >();
+    const list = attestations.data ?? [];
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i];
+      const arr = map.get(a.recipient.toLowerCase()) ?? [];
+      arr.push({
+        id: String(i),
+        badgeName: a.badgeName,
+        justification: a.attestationJustification,
+        issuer: a.issuer,
+      });
+      map.set(a.recipient.toLowerCase(), arr);
+    }
+    return map;
+  }, [attestations.data]);
+
+  const profiles: Profile[] = useMemo(() => {
+    return baseProfiles.map((p) => {
+      const list =
+        attestationsByRecipient.get((p.address || "").toLowerCase()) ?? [];
+      return {
+        ...p,
+        attestationCount: list.length,
+        attestations: list,
+      };
+    });
+  }, [baseProfiles, attestationsByRecipient]);
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -43,10 +77,10 @@ export function ProfilesList() {
         <CreateProfileButton />
       </div>
 
-      {isLoading ? (
+      {isLoading || attestations.isLoading ? (
         <p className="text-sm text-gray-600">Loading profiles...</p>
       ) : null}
-      {error ? (
+      {error || attestations.error ? (
         <p className="text-sm text-red-600">{(error as Error).message}</p>
       ) : null}
 
@@ -57,8 +91,8 @@ export function ProfilesList() {
             address={profile.address}
             name={profile.name}
             description={profile.description}
-            badgeCount={profile.badgeCount}
-            badges={profile.badges}
+            attestationCount={profile.attestationCount}
+            attestations={profile.attestations}
           />
         ))}
       </div>

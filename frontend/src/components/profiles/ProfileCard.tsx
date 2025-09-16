@@ -1,4 +1,4 @@
-import { Badge, Award, User, Edit, Trash } from "lucide-react";
+import { Badge, Award, User, Edit, Trash, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,17 +10,18 @@ import { Button } from "@/components/ui/button";
 import { EditProfileDialog } from "./EditProfileDialog";
 import { useAccount } from "wagmi";
 import DeleteProfileDialog from "./DeleteProfileDialog";
+import { AddAttestationDialog } from "./AddAttestationDialog";
 
 interface ProfileCardProps {
   address: string;
   name?: string;
   description?: string;
   avatar?: string;
-  badgeCount: number;
-  badges: Array<{
+  attestationCount: number;
+  attestations: Array<{
     id: string;
-    name: string;
-    description: string;
+    badgeName: string;
+    justification: string;
     issuer: string;
   }>;
 }
@@ -30,15 +31,14 @@ export function ProfileCard({
   name,
   description,
   avatar,
-  badgeCount,
-  badges,
+  attestationCount,
+  attestations,
 }: ProfileCardProps) {
   const { address: connectedAddress } = useAccount();
   const isOwner = connectedAddress?.toLowerCase() === address.toLowerCase();
 
   const displayName = name || `${address.slice(0, 6)}...${address.slice(-4)}`;
   const displayAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-
   return (
     <Card
       className={`hover:shadow-md transition-shadow relative ${
@@ -85,6 +85,18 @@ export function ProfileCard({
             </Button>
           </EditProfileDialog>
         )}
+        {!isOwner && (
+          <AddAttestationDialog recipient={address}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 h-8 w-8 p-0"
+              aria-label="Add attestation"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </AddAttestationDialog>
+        )}
       </CardHeader>
       <CardContent>
         {description && (
@@ -94,24 +106,24 @@ export function ProfileCard({
         <div className="mt-4 flex items-center space-x-4">
           <div className="flex items-center space-x-1 text-sm text-gray-500">
             <Award className="h-4 w-4" />
-            <span>{badgeCount} badges</span>
+            <span>{attestationCount} attestations</span>
           </div>
         </div>
 
-        {badges.length > 0 && (
+        {attestations.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {badges.slice(0, 3).map((badge) => (
+            {attestations.slice(0, 3).map((attestation) => (
               <span
-                key={badge.id}
+                key={attestation.id}
                 className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
               >
                 <Badge className="h-3 w-3 mr-1" />
-                {badge.name}
+                {attestation.badgeName}
               </span>
             ))}
-            {badges.length > 3 && (
+            {attestations.length > 3 && (
               <span className="text-xs text-gray-500">
-                +{badges.length - 3} more
+                +{attestations.length - 3} more
               </span>
             )}
           </div>

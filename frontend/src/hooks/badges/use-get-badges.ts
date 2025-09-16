@@ -47,7 +47,6 @@ export function useGetBadges(): {
       enabled: Boolean(address),
     },
   });
-  console.log("totalBadgesQuery", totalBadgesQuery.data);
 
   const count = Number((totalBadgesQuery.data as bigint | undefined) ?? 0n);
 

@@ -1,7 +1,7 @@
-type ProfileBadge = {
+type ProfileAttestation = {
   id: string;
-  name: string;
-  description: string;
+  badgeName: string;
+  justification: string;
   issuer: string;
 };
 
@@ -9,8 +9,8 @@ export type Profile = {
   address: string;
   name?: string;
   description?: string;
-  badgeCount: number;
-  badges: ProfileBadge[];
+  attestationCount: number;
+  attestations: ProfileAttestation[];
 };
 
 export const PROFILES: Profile[] = [
@@ -18,24 +18,24 @@ export const PROFILES: Profile[] = [
     address: "0x1234...5678",
     name: "Alice Developer",
     description: "Full-stack developer passionate about Web3 and Rust",
-    badgeCount: 5,
-    badges: [
+    attestationCount: 5,
+    attestations: [
       {
         id: "1",
-        name: "Rust",
-        description: "Rust programming",
+        badgeName: "Rust",
+        justification: "Rust programming",
         issuer: "0xabcd...1234",
       },
       {
         id: "2",
-        name: "React",
-        description: "React development",
+        badgeName: "React",
+        justification: "React development",
         issuer: "0xefgh...5678",
       },
       {
         id: "3",
-        name: "Web3",
-        description: "Blockchain development",
+        badgeName: "Web3",
+        justification: "Blockchain development",
         issuer: "0xijkl...9012",
       },
     ],
@@ -44,30 +44,30 @@ export const PROFILES: Profile[] = [
     address: "0x9876...5432",
     name: "Bob Builder",
     description: "Smart contract developer and DeFi enthusiast",
-    badgeCount: 3,
-    badges: [
+    attestationCount: 3,
+    attestations: [
       {
         id: "4",
-        name: "Solidity",
-        description: "Smart contract development",
+        badgeName: "Solidity",
+        justification: "Smart contract development",
         issuer: "0xmnop...3456",
       },
       {
         id: "5",
-        name: "DeFi",
-        description: "Decentralized Finance",
+        badgeName: "DeFi",
+        justification: "Decentralized Finance",
         issuer: "0xqrst...7890",
       },
     ],
   },
   {
     address: "0x5555...7777",
-    badgeCount: 2,
-    badges: [
+    attestationCount: 2,
+    attestations: [
       {
         id: "6",
-        name: "TypeScript",
-        description: "TypeScript development",
+        badgeName: "TypeScript",
+        justification: "TypeScript development",
         issuer: "0xuvwx...1234",
       },
     ],

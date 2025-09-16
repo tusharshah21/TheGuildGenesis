@@ -9,6 +9,11 @@ import {IEAS, Attestation} from "eas-contracts/IEAS.sol";
 /// @title TheGuildActivityToken (TGA)
 /// @notice ERC20 that also serves as an EAS schema resolver; mints on attest.
 contract TheGuildActivityToken is ERC20, Ownable, SchemaResolver {
+    // enumerate attestation ids
+    bytes32[] private attestationIds;
+
+    //IEAS private _eas;
+
     constructor(
         IEAS eas
     )
@@ -28,6 +33,8 @@ contract TheGuildActivityToken is ERC20, Ownable, SchemaResolver {
         uint256
     ) internal override returns (bool) {
         _mint(attestation.attester, 10 * (10 ** decimals()));
+        // TODO: get rid of this when we have our graphQL setup
+        attestationIds.push(attestation.uid);
         return true;
     }
 
@@ -37,5 +44,19 @@ contract TheGuildActivityToken is ERC20, Ownable, SchemaResolver {
         uint256
     ) internal pure override returns (bool) {
         return true;
+    }
+
+    // TODO: get rid of this when we have our graphQL setup
+
+    /// @notice Get attestation count
+    function getAttestationCount() external view returns (uint256) {
+        return attestationIds.length;
+    }
+
+    /// @notice Get attestation id at a specific index
+    function getAttestationAtIndex(
+        uint256 index
+    ) external view returns (Attestation memory) {
+        return _eas.getAttestation(attestationIds[index]);
     }
 }
