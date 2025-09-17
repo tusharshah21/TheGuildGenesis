@@ -38,75 +38,27 @@ This is a monorepo containing:
 ## Quick Start
 
 ### Prerequisites
-- [Nix](https://nixos.org/download.html) with flakes enabled
-- [direnv](https://direnv.net/) (optional, for automatic environment loading)
-- [just](https://github.com/casey/just) (command runner)
+- [Docker](https://www.docker.com/)
 - [Foundry](https://book.getfoundry.sh/getting-started/installation) (for smart contracts)
-
-### Setup
-
-1. **Clone and enter the development environment:**
-   ```bash
-   git clone <repository-url>
-   cd TheGuildGenesis
-   
-   # If using direnv (recommended)
-   direnv allow
-   
-   # Or manually enter the Nix shell
-   nix develop
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   just install-all
-   ```
 
 ### Development Workflow
 
 #### Quick Start
 
 ```bash
-# Set up the database
-just db-setup
+cd backend
+cargo install sqlx-cli --no-default-features --features rustls,postgres  
+cargo sqlx prepare -- --bin guild-backend
+```
 
-# Start both frontend and backend
-just dev
+```bash
+docker-compose up -d
 ```
 
 **Access the applications:**
 - Frontend: http://localhost:4321
 - Backend API: http://localhost:3001
 - PostgreSQL: localhost:5432
-
-#### Individual Services
-
-```bash
-# Start database only
-just db-start
-
-# Start frontend only
-just dev-frontend
-
-# Start backend only
-just dev-backend
-
-# Stop database
-just db-stop
-```
-
-#### Database Management
-
-```bash
-# Set up database with migrations
-just db-setup
-
-# Reset database completely
-just db-reset
-
-# Stop database
-just db-stop
-```
 
 #### Smart Contracts Development
 
@@ -131,17 +83,6 @@ forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript --rp
 # Deploy to testnet/mainnet
 forge script script/TheGuildBadgeRegistry.s.sol:TheGuildBadgeRegistryScript --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
 ```
-
-### Available Commands
-
-Run `just help` to see all available commands:
-
-- **Development:** `just dev`, `just dev-frontend`, `just dev-backend`
-- **Database:** `just db-start`, `just db-stop`, `just db-setup`, `just db-reset`
-- **Build:** `just build`, `just build-frontend`, `just build-backend`
-- **Testing:** `just test`, `just test-frontend`, `just test-backend`
-- **Code Quality:** `just lint`, `just format`
-- **Utilities:** `just clean`, `just help`
 
 ## Smart Contracts
 
@@ -203,22 +144,11 @@ event BadgeCreated(bytes32 indexed name, bytes32 description, address indexed cr
 
 ## Development Philosophy
 
-- **Nix-first development** - Reproducible environments without Docker overhead
 - **Simple first, complex later** - Start with MVP, iterate
 - **Non-profit, member-driven** - Community ownership
 - **Horizontal governance** - Flat organization structure
 - **Action over endless talk** - Build and ship
 - **We use what we build** - Dogfooding our own tools
-
-### Why Nix?
-
-This project uses Nix for development instead of Docker because:
-
-- **Reproducible environments** - Everyone gets identical toolchains
-- **No container overhead** - Direct process execution, faster builds
-- **Simpler setup** - One command (`nix develop`) gets you everything
-- **Better performance** - No Docker daemon, faster file system access
-- **True reproducibility** - Nix ensures exact same versions across all systems
 
 ## Contributing
 
