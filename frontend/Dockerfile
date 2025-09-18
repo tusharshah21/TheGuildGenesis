@@ -10,6 +10,6 @@ FROM node:20-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app ./
-ENV PORT=8080
-EXPOSE 8080
-CMD ["node", "server.js"]
+ENV HOST=0.0.0.0
+# keep CMD as:
+CMD ["node", "./dist/server/entry.mjs"]

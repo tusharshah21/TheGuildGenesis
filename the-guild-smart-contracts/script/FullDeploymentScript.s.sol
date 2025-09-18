@@ -13,7 +13,7 @@ import {console} from "forge-std/console.sol";
 contract FullDeploymentScript is Script {
     function run() public {
         EAS eas;
-        bytes32 salt = bytes32("theguild_v_0.1.0");
+        bytes32 salt = bytes32("theguild_v_0.1.1");
         // EAS addresses per https://github.com/ethereum-attestation-service/eas-contracts deployments
         // Base mainnet (8453) and Base Goerli/Sepolia (84531/84532) use the canonical predeploy 0x...21
         // Optimism mainnet (10) and OP Sepolia (11155420) also use canonical 0x...21
