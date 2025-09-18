@@ -1,4 +1,4 @@
-import { Smile, BadgeCheck } from "lucide-react";
+import { Smile, BadgeCheck, Home } from "lucide-react";
 
 import {
   Sidebar,
@@ -13,6 +13,11 @@ import {
 
 // Menu items.
 const items = [
+  {
+    title: "Home",
+    url: "/",
+    icon: Home,
+  },
   {
     title: "Profiles",
     url: "/profiles",

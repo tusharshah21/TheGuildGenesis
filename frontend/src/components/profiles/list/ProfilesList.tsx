@@ -83,7 +83,11 @@ export function ProfilesList() {
         <p className="text-sm text-gray-600">Loading profiles...</p>
       ) : null}
       {error || attestations.error ? (
-        <p className="text-sm text-red-600">{(error as Error).message}</p>
+        <p className="text-sm text-red-600">
+          {(error as any)?.message ??
+            (attestations.error as any)?.message ??
+            "An error occurred"}
+        </p>
       ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
