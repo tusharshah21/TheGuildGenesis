@@ -52,11 +52,23 @@ jobs:
       - name: Build and push (linux/amd64)
         env:
           HEROKU_FRONTEND_APP: ${{ secrets.HEROKU_FRONTEND_APP }}
+          PUBLIC_WALLET_CONNECT_PROJECT_ID: ${{ secrets.PUBLIC_WALLET_CONNECT_PROJECT_ID }}
+          PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
+          PUBLIC_BADGE_REGISTRY_ADDRESS: ${{ secrets.PUBLIC_BADGE_REGISTRY_ADDRESS }}
+          PUBLIC_EAS_CONTRACT_ADDRESS: ${{ secrets.PUBLIC_EAS_CONTRACT_ADDRESS }}
+          PUBLIC_ACTIVITY_TOKEN_ADDRESS: ${{ secrets.PUBLIC_ACTIVITY_TOKEN_ADDRESS }}
+          PUBLIC_SCHEMA_ID: ${{ secrets.PUBLIC_SCHEMA_ID }}
         run: |
           docker buildx build \
             --platform linux/amd64 \
             -t registry.heroku.com/${HEROKU_FRONTEND_APP}/web \
             -f frontend/Dockerfile frontend \
+            --build-arg PUBLIC_WALLET_CONNECT_PROJECT_ID="${PUBLIC_WALLET_CONNECT_PROJECT_ID}" \
+            --build-arg PUBLIC_API_URL="${PUBLIC_API_URL}" \
+            --build-arg PUBLIC_BADGE_REGISTRY_ADDRESS="${PUBLIC_BADGE_REGISTRY_ADDRESS}" \
+            --build-arg PUBLIC_EAS_CONTRACT_ADDRESS="${PUBLIC_EAS_CONTRACT_ADDRESS}" \
+            --build-arg PUBLIC_ACTIVITY_TOKEN_ADDRESS="${PUBLIC_ACTIVITY_TOKEN_ADDRESS}" \
+            --build-arg PUBLIC_SCHEMA_ID="${PUBLIC_SCHEMA_ID}" \
             --push
         if: steps.changes.outputs.frontend == 'true'
 

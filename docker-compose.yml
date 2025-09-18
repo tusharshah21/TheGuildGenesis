@@ -27,15 +27,24 @@ services:
       - postgres
 
   frontend:
-    build: ./frontend
-    command: npm run dev -- --host 0.0.0.0 --port 4321
-    ports:
-      - "4321:4321"
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_WALLET_CONNECT_PROJECT_ID: ${PUBLIC_WALLET_CONNECT_PROJECT_ID}
+        PUBLIC_API_URL: ${PUBLIC_API_URL}
+        PUBLIC_BADGE_REGISTRY_ADDRESS: ${PUBLIC_BADGE_REGISTRY_ADDRESS}
+        PUBLIC_EAS_CONTRACT_ADDRESS: ${PUBLIC_EAS_CONTRACT_ADDRESS}
+        PUBLIC_ACTIVITY_TOKEN_ADDRESS: ${PUBLIC_ACTIVITY_TOKEN_ADDRESS}
+        PUBLIC_SCHEMA_ID: ${PUBLIC_SCHEMA_ID}
+    env_file:
+      - .env
     environment:
       HOST: 0.0.0.0
-      PORT: 4321
-      PUBLIC_WALLET_CONNECT_PROJECT_ID: ${PUBLIC_WALLET_CONNECT_PROJECT_ID}
-      PUBLIC_API_URL: ${PUBLIC_API_URL}
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
     depends_on:
       - backend
 
