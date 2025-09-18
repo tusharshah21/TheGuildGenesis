@@ -32,10 +32,6 @@ jobs:
               - 'frontend/vitest.config.ts'
               - 'frontend/tsconfig.json'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        if: steps.changes.outputs.frontend == 'true'
-
       - name: Install Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
@@ -59,7 +55,7 @@ jobs:
           PUBLIC_ACTIVITY_TOKEN_ADDRESS: ${{ secrets.PUBLIC_ACTIVITY_TOKEN_ADDRESS }}
           PUBLIC_SCHEMA_ID: ${{ secrets.PUBLIC_SCHEMA_ID }}
         run: |
-          docker buildx build \
+          DOCKER_BUILDKIT=0 docker build \
             --platform linux/amd64 \
             -t registry.heroku.com/${HEROKU_FRONTEND_APP}/web \
             -f frontend/Dockerfile frontend \
@@ -69,7 +65,8 @@ jobs:
             --build-arg PUBLIC_EAS_CONTRACT_ADDRESS="${PUBLIC_EAS_CONTRACT_ADDRESS}" \
             --build-arg PUBLIC_ACTIVITY_TOKEN_ADDRESS="${PUBLIC_ACTIVITY_TOKEN_ADDRESS}" \
             --build-arg PUBLIC_SCHEMA_ID="${PUBLIC_SCHEMA_ID}" \
-            --push
+
+          docker push registry.heroku.com/${HEROKU_FRONTEND_APP}/web
         if: steps.changes.outputs.frontend == 'true'
 
       - name: Release on Heroku
