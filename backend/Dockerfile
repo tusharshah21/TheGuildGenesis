@@ -1,5 +1,6 @@
 FROM rust:latest AS build
 WORKDIR /app
+ENV SQLX_OFFLINE=true
 COPY . .
 RUN cargo build --release
 

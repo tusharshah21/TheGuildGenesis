@@ -32,7 +32,8 @@ async fn main() -> anyhow::Result<()> {
 
     let app = create_app(pool).await;
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3001));
+    let port = env::var("PORT").unwrap_or_else(|_| "3001".to_string());
+    let addr = SocketAddr::from(([0, 0, 0, 0], port.parse::<u16>().unwrap()));
     tracing::info!("Server listening on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
