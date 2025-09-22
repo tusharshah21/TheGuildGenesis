@@ -1,4 +1,4 @@
-import { Badge, Award, User, Edit, Trash, Plus } from "lucide-react";
+import { Badge, Award, User, Edit, Trash, Plus, Coins } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,6 +11,8 @@ import { EditProfileDialog } from "../action-buttons/EditProfileDialog";
 import { useAccount } from "wagmi";
 import DeleteProfileDialog from "../action-buttons/DeleteProfileDialog";
 import { AddAttestationDialog } from "../action-buttons/AddAttestationDialog";
+import { formatUnits } from "viem";
+import useGetActivityTokenBalance from "@/hooks/attestations/use-get-activity-token-balance";
 
 interface ProfileCardProps {
   address: string;
@@ -36,6 +38,14 @@ export function ProfileCard({
 }: ProfileCardProps) {
   const { address: connectedAddress } = useAccount();
   const isOwner = connectedAddress?.toLowerCase() === address.toLowerCase();
+
+  const balanceQuery = useGetActivityTokenBalance(address as `0x${string}`);
+  const formattedBalance = (() => {
+    const raw = balanceQuery.data?.raw;
+    const decimals = balanceQuery.data?.decimals ?? 18;
+    if (raw === undefined) return undefined;
+    return formatUnits(raw, decimals);
+  })();
 
   const displayName = name || `${address.slice(0, 6)}...${address.slice(-4)}`;
   const displayAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -79,6 +89,12 @@ export function ProfileCard({
               {displayAddress}
             </a>
           </CardDescription>
+          <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
+            <Coins className="h-3 w-3" />
+            <span>
+              {balanceQuery.isLoading ? "…" : (formattedBalance ?? "0")} TGA
+            </span>
+          </div>
         </div>
         {isOwner && (
           <EditProfileDialog
