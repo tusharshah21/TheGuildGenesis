@@ -7,9 +7,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
 
 export function ProfileAttestations({ address }: { address: string }) {
   const attestationsQuery = useGetAttestations();
+  const profilesQuery = useGetProfiles();
 
   const attestations = useMemo(() => {
     const list = attestationsQuery.data ?? [];
@@ -23,6 +25,15 @@ export function ProfileAttestations({ address }: { address: string }) {
       issuer: a.issuer,
     }));
   }, [attestationsQuery.data, address]);
+
+  const profileNameByAddress = useMemo(() => {
+    const map = new Map<string, string>();
+    const list = profilesQuery.data ?? [];
+    for (const p of list) {
+      if (p.address) map.set(p.address.toLowerCase(), p.name || "");
+    }
+    return map;
+  }, [profilesQuery.data]);
 
   const grouped = useMemo(() => {
     const map = new Map<
@@ -77,7 +88,15 @@ export function ProfileAttestations({ address }: { address: string }) {
                             {it.justification}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            Issued by {it.issuer}
+                            Issued by{" "}
+                            <a
+                              className="text-indigo-600 hover:underline"
+                              href={`/profiles/${it.issuer}`}
+                            >
+                              {profileNameByAddress.get(
+                                it.issuer.toLowerCase()
+                              ) || it.issuer}
+                            </a>
                           </p>
                         </div>
                       </div>
