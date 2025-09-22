@@ -30,6 +30,19 @@ https://amoy.polygonscan.com/address/0xc142ab6b4688b7b81cb4cc8b305f517bba3bfd25
 EAS Schema ID:
 0xb167f07504166f717f2a2710dbcfbfdf8fad6e8c6128c1a7fa80768f61b1d0b2
 
+### Amoy for dev
+Salt: "theguild_v_0.1.1_dev"
+
+TheGuildActivityToken
+https://amoy.polygonscan.com/address/0x82eba5400b4e914a9b5e4573867b9a73c488c1ed 
+
+TheGuildBadgeRegistry
+https://amoy.polygonscan.com/address/0x8ac95734e778322684f1d318fb7633777baa8427 
+
+EAS Schema ID:
+0x8ef2fdb896e42534302cc992c2b2daf614ccabf3fc6d78ce15dc35534b8fa481
+
+
 ## Foundry Usage
 
 https://book.getfoundry.sh/
