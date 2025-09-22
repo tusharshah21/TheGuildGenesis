@@ -29,6 +29,7 @@ vi.mock("wagmi", () => ({
   useWaitForTransactionReceipt: () => ({ data: vi.fn() }),
   useReadContract: () => ({ data: undefined }),
   useReadContracts: () => ({ data: undefined }),
+  useConfig: () => ({}),
 }));
 
 // Mock RainbowKit
