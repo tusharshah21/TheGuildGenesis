@@ -7,7 +7,7 @@ export default function GettingStartedPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Getting Started</h1>
         <a
-          href="https://discord.gg/pg4UgaTr"
+          href="https://discord.gg/axCqT23Xhj"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -58,7 +58,7 @@ export default function GettingStartedPage() {
               Ask in our Discord and a member will send you some testnet funds.
             </p>
             <a
-              href="https://discord.gg/pg4UgaTr"
+              href="https://discord.gg/axCqT23Xhj"
               target="_blank"
               rel="noreferrer"
               className="text-indigo-600 hover:underline"
