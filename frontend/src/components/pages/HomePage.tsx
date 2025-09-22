@@ -62,6 +62,32 @@ export default function HomePage() {
           can earn your first attestation.
         </p>
       </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Learn more</h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            <a
+              href="https://medium.com/@antoineestienne/theguild-presentation-2b2b147d1fa5"
+              target="_blank"
+              rel="noreferrer"
+              className="text-indigo-600 hover:underline"
+            >
+              The Guild — Presentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://medium.com/@antoineestienne/theguild-the-plan-25cd1ffd1e5b"
+              target="_blank"
+              rel="noreferrer"
+              className="text-indigo-600 hover:underline"
+            >
+              The Guild — The Plan
+            </a>
+          </li>
+        </ul>
+      </section>
     </div>
   );
 }
