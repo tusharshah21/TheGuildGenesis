@@ -1,9 +1,8 @@
-import { User, Coins } from "lucide-react";
+import { User } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useMemo } from "react";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
-import { formatUnits } from "viem";
-import useGetActivityTokenBalance from "@/hooks/attestations/use-get-activity-token-balance";
+import AddressTokenBalance from "@/components/AddressTokenBalance";
 
 export function ProfileHeader({ address }: { address: string }) {
   const profilesQuery = useGetProfiles();
@@ -29,14 +28,6 @@ export function ProfileHeader({ address }: { address: string }) {
     !!address &&
     connectedAddress.toLowerCase() === address.toLowerCase();
 
-  const balanceQuery = useGetActivityTokenBalance(address as `0x${string}`);
-  const formattedBalance = useMemo(() => {
-    const raw = balanceQuery.data?.raw;
-    const decimals = balanceQuery.data?.decimals ?? 18;
-    if (raw === undefined) return undefined;
-    return formatUnits(raw, decimals);
-  }, [balanceQuery.data]);
-
   return (
     <header className="flex items-start gap-4">
       <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
@@ -54,12 +45,7 @@ export function ProfileHeader({ address }: { address: string }) {
         {displayAddress ? (
           <p className="font-mono text-sm text-gray-600">{displayAddress}</p>
         ) : null}
-        <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
-          <Coins className="h-3 w-3" />
-          <span>
-            {balanceQuery.isLoading ? "…" : (formattedBalance ?? "0")} TGA
-          </span>
-        </div>
+        <AddressTokenBalance address={address as `0x${string}`} />
       </div>
     </header>
   );
