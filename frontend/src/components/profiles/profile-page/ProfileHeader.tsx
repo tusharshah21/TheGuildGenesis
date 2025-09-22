@@ -2,6 +2,7 @@ import { User } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useMemo } from "react";
 import { useGetProfiles } from "@/hooks/profiles/use-get-profiles";
+import AddressTokenBalance from "@/components/AddressTokenBalance";
 
 export function ProfileHeader({ address }: { address: string }) {
   const profilesQuery = useGetProfiles();
@@ -44,6 +45,7 @@ export function ProfileHeader({ address }: { address: string }) {
         {displayAddress ? (
           <p className="font-mono text-sm text-gray-600">{displayAddress}</p>
         ) : null}
+        <AddressTokenBalance address={address as `0x${string}`} />
       </div>
     </header>
   );

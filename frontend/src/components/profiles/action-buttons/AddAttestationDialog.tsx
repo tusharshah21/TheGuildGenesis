@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetAttestations } from "@/hooks/attestations/use-get-attestations";
+import { useGetActivityTokenBalance } from "@/hooks/attestations/use-get-activity-token-balance";
 
 const formSchema = z.object({
   badgeName: z.string().min(1, { message: "Badge name is required." }),
@@ -56,7 +57,8 @@ export function AddAttestationDialog({
     reset,
   } = useCreateAttestation();
   const { data: badges, isLoading: badgesLoading } = useGetBadges();
-  const { refetch } = useGetAttestations();
+  const { refetch: refetchAttestations } = useGetAttestations();
+  const { refetch: refetchActivityTokenBalance } = useGetActivityTokenBalance();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -73,12 +75,19 @@ export function AddAttestationDialog({
 
   useEffect(() => {
     if (isConfirmed) {
-      refetch();
+      refetchAttestations();
+      refetchActivityTokenBalance();
       setOpen(false);
       form.reset();
       reset();
     }
-  }, [isConfirmed, refetch, form, reset]);
+  }, [
+    isConfirmed,
+    refetchAttestations,
+    refetchActivityTokenBalance,
+    form,
+    reset,
+  ]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

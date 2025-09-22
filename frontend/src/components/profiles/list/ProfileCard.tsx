@@ -11,6 +11,7 @@ import { EditProfileDialog } from "../action-buttons/EditProfileDialog";
 import { useAccount } from "wagmi";
 import DeleteProfileDialog from "../action-buttons/DeleteProfileDialog";
 import { AddAttestationDialog } from "../action-buttons/AddAttestationDialog";
+import AddressTokenBalance from "@/components/AddressTokenBalance";
 
 interface ProfileCardProps {
   address: string;
@@ -79,6 +80,7 @@ export function ProfileCard({
               {displayAddress}
             </a>
           </CardDescription>
+          <AddressTokenBalance address={address as `0x${string}`} />
         </div>
         {isOwner && (
           <EditProfileDialog

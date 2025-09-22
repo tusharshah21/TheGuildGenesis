@@ -11,6 +11,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ActivityTokenBalance } from "@/components/ActivityTokenBalance";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ export function AppWrapper({ children }: Web3ProviderProps) {
                     </div>
 
                     <div className="flex items-center space-x-4">
+                      <ActivityTokenBalance />
                       <ConnectButton />
                     </div>
                   </div>
