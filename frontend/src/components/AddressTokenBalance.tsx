@@ -1,4 +1,3 @@
-import React, { useMemo } from "react";
 import { Coins, HelpCircle } from "lucide-react";
 import { formatUnits } from "viem";
 import useGetActivityTokenBalance from "@/hooks/attestations/use-get-activity-token-balance";
@@ -12,12 +11,9 @@ import {
 export function AddressTokenBalance({ address }: { address: `0x${string}` }) {
   const balanceQuery = useGetActivityTokenBalance(address);
 
-  const formatted = useMemo(() => {
-    const raw = balanceQuery.data?.raw;
-    const decimals = balanceQuery.data?.decimals ?? 18;
-    if (raw === undefined) return undefined;
-    return formatUnits(raw, decimals);
-  }, [balanceQuery.data]);
+  const raw = balanceQuery.data?.raw;
+  const decimals = balanceQuery.data?.decimals ?? 18;
+  const formatted = raw === undefined ? undefined : formatUnits(raw, decimals);
 
   return (
     <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
