@@ -1,5 +1,11 @@
-import { useMemo } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useMemo, useRef } from "react";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useConfig,
+  useAccount,
+} from "wagmi";
+import { simulateContract } from "@wagmi/core";
 import { encodeAbiParameters } from "viem";
 import { easAbi } from "@/lib/abis/easAbi";
 import {
@@ -31,6 +37,8 @@ function encodeBadgeData(
 }
 
 export function useCreateAttestation() {
+  const config = useConfig();
+  const { address: account, chainId } = useAccount();
   const {
     writeContractAsync,
     data: hash,
@@ -38,6 +46,7 @@ export function useCreateAttestation() {
     error,
     reset,
   } = useWriteContract();
+  const isBusyRef = useRef(false);
 
   const createAttestation = useMemo(() => {
     return async (
@@ -45,14 +54,20 @@ export function useCreateAttestation() {
       badgeName: string,
       justification: string
     ) => {
+      if (isBusyRef.current || isPending) {
+        throw new Error(
+          "Previous attestation is still pending. Please wait..."
+        );
+      }
+      isBusyRef.current = true;
       // Convert strings to bytes32
       const badgeNameBytes = stringToBytes32(badgeName);
       const justificationBytes = stringToBytes32(justification);
 
       // Encode data according to schema
       const encodedData = encodeBadgeData(badgeNameBytes, justificationBytes);
-      // Call EAS.attest via wagmi
-      const uid = await writeContractAsync({
+      // 1) Simulate with exact sender/chain to catch reverts and get prepared request
+      const simulation = await simulateContract(config, {
         abi: easAbi,
         address: EAS_CONTRACT_ADDRESS,
         functionName: "attest",
@@ -70,12 +85,26 @@ export function useCreateAttestation() {
             },
           },
         ],
-        // value: 0n, // no ETH
+        account: account as `0x${string}` | undefined,
+        chainId,
       });
 
-      return uid;
+      // 2) Bump gas params slightly and send
+      const bump = (v?: bigint) =>
+        typeof v === "bigint" ? (v * 12n) / 10n : v;
+      const req: any = { ...simulation.request };
+      req.gas = bump(req.gas);
+      req.maxFeePerGas = bump(req.maxFeePerGas);
+      req.maxPriorityFeePerGas = bump(req.maxPriorityFeePerGas);
+
+      try {
+        const txHash = await writeContractAsync(req);
+        return txHash;
+      } finally {
+        isBusyRef.current = false;
+      }
     };
-  }, [writeContractAsync]);
+  }, [account, chainId, config, isPending, writeContractAsync]);
 
   const wait = useWaitForTransactionReceipt({
     hash: hash as `0x${string}` | undefined,
