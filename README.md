@@ -154,6 +154,8 @@ event BadgeCreated(bytes32 indexed name, bytes32 description, address indexed cr
 
 This is a community-driven project. Join our [Discord](https://discord.gg/pg4UgaTr) to discuss features, propose changes, and contribute to the codebase.
 
+See detailed steps in [CONTRIBUTION.md](CONTRIBUTION.md).
+
 ## License
 
 See [LICENSE](LICENSE) file for details.
