@@ -48,7 +48,7 @@ export function AddAttestationDialog({
   children: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
-  const [friendlyError, setFriendlyError] = useState<string | null>(null);
+  const [errorDisplayText, setErrorDisplayText] = useState<string | null>(null);
   const {
     createAttestation,
     isPending,
@@ -68,7 +68,7 @@ export function AddAttestationDialog({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      setFriendlyError(null);
+      setErrorDisplayText(null);
       await createAttestation(
         recipient as `0x${string}`,
         values.badgeName,
@@ -81,11 +81,11 @@ export function AddAttestationDialog({
         message.includes('Contract function "attest" reverted') ||
         message.toLowerCase().includes("revert");
       if (isRpcRevert) {
-        setFriendlyError(
+        setErrorDisplayText(
           "The network temporarily rejected this request. Please try again later."
         );
       } else {
-        setFriendlyError(message);
+        setErrorDisplayText(message);
       }
     }
   };
@@ -97,7 +97,7 @@ export function AddAttestationDialog({
       setOpen(false);
       form.reset();
       reset();
-      setFriendlyError(null);
+      setErrorDisplayText(null);
     }
   }, [
     isConfirmed,
@@ -186,8 +186,8 @@ export function AddAttestationDialog({
                 Waiting for confirmations…
               </p>
             ) : null}
-            {friendlyError ? (
-              <p className="text-sm text-red-600">{friendlyError}</p>
+            {errorDisplayText ? (
+              <p className="text-sm text-red-600">{errorDisplayText}</p>
             ) : error ? (
               <p className="text-sm text-red-600">{(error as Error).message}</p>
             ) : null}
