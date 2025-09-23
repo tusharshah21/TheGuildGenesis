@@ -13,7 +13,7 @@ import {console} from "forge-std/console.sol";
 contract FullDeploymentScript is Script {
     function run() public {
         EAS eas;
-        bytes32 salt = bytes32("theguild_v_0.1.1_dev");
+        bytes32 salt = bytes32("theguild_v_0.1.1");
         // EAS addresses per https://github.com/ethereum-attestation-service/eas-contracts deployments
         // Base mainnet (8453) and Base Goerli/Sepolia (84531/84532) use the canonical predeploy 0x...21
         // Optimism mainnet (10) and OP Sepolia (11155420) also use canonical 0x...21
@@ -36,7 +36,7 @@ contract FullDeploymentScript is Script {
         }
 
         // Register TheGuild Schema
-        string memory schema = "bytes32 badgeName, bytes32 justification";
+        string memory schema = "bytes32 badgeName, bytes justification";
         SchemaRegistry schemaRegistry = SchemaRegistry(
             EASUtils.getSchemaRegistryAddress(vm)
         );
@@ -78,10 +78,7 @@ contract FullDeploymentScript is Script {
             expirationTime: 0,
             revocable: true,
             refUID: bytes32(0),
-            data: abi.encode(
-                bytes32("Rust"),
-                bytes32("Saw them coding in Rust")
-            ),
+            data: abi.encode(bytes32("Rust"), bytes("Saw them coding in Rust")),
             value: 0
         });
 

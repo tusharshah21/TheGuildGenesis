@@ -19,6 +19,8 @@ remappings = [
 
 [rpc_endpoints]
 amoy = "${AMOY_RPC_URL}"
+base-sepolia="${BASE_SEPOLIA_URL}"
 
 [etherscan]
 amoy = { key = "${ETHERSCAN_API_KEY}" }
+base-sepolia = { key = "${ETHERSCAN_API_KEY}" }
