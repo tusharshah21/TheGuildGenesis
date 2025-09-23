@@ -36,7 +36,7 @@ contract FullDeploymentScript is Script {
         }
 
         // Register TheGuild Schema
-        string memory schema = "bytes32 badgeName, bytes32 justification";
+        string memory schema = "bytes32 badgeName, bytes justification";
         SchemaRegistry schemaRegistry = SchemaRegistry(
             EASUtils.getSchemaRegistryAddress(vm)
         );
@@ -78,10 +78,7 @@ contract FullDeploymentScript is Script {
             expirationTime: 0,
             revocable: true,
             refUID: bytes32(0),
-            data: abi.encode(
-                bytes32("Rust"),
-                bytes32("Saw them coding in Rust")
-            ),
+            data: abi.encode(bytes32("Rust"), bytes("Saw them coding in Rust")),
             value: 0
         });
 
