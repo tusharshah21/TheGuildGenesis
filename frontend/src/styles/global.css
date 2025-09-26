@@ -122,12 +122,12 @@
 #rays {
   transform-box: fill-box;
   transform-origin: center;
-  animation: spin 90s linear infinite;
-  opacity: 0.33;
+  animation: spin 180s linear infinite;
+  opacity: 0.23;
 }
 
 #logo_svg {
-  opacity: 0.23;
+  opacity: 0.16;
 }
 
 @keyframes spin {
