@@ -9,9 +9,10 @@ use crate::{
     application::{
         commands::{
             create_profile::create_profile, get_all_profiles::get_all_profiles,
-            get_profile::get_profile, update_profile::update_profile,
+            get_login_nonce::get_login_nonce, get_profile::get_profile,
+            update_profile::update_profile,
         },
-        dtos::{CreateProfileRequest, ProfileResponse, UpdateProfileRequest},
+        dtos::{CreateProfileRequest, NonceResponse, ProfileResponse, UpdateProfileRequest},
     },
     domain::value_objects::WalletAddress,
 };
@@ -75,4 +76,18 @@ pub async fn delete_profile_handler(
         .await
         .unwrap();
     StatusCode::ACCEPTED
+}
+
+pub async fn get_nonce_handler(
+    State(state): State<AppState>,
+    Path(address): Path<String>,
+) -> impl IntoResponse {
+    match get_login_nonce(state.profile_repository, address.clone()).await {
+        Ok(nonce) => Json(NonceResponse {
+            nonce,
+            address,
+        })
+        .into_response(),
+        Err(e) => (StatusCode::NOT_FOUND, Json(serde_json::json!({"error": e}))).into_response(),
+    }
 }

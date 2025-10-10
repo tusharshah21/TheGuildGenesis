@@ -24,7 +24,7 @@ impl ProfileRepository for PostgresProfileRepository {
     ) -> Result<Option<Profile>, Box<dyn std::error::Error>> {
         let row = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
             FROM profiles
             WHERE address = $1
             "#,
@@ -40,6 +40,7 @@ impl ProfileRepository for PostgresProfileRepository {
             description: r.description,
             avatar_url: r.avatar_url,
             github_login: r.github_login,
+            login_nonce: r.login_nonce,
             created_at: r.created_at.unwrap(),
             updated_at: r.updated_at.unwrap(),
         }))
@@ -48,7 +49,7 @@ impl ProfileRepository for PostgresProfileRepository {
     async fn find_all(&self) -> Result<Vec<Profile>, Box<dyn std::error::Error>> {
         let rows = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
             FROM profiles
             "#,
         )
@@ -64,6 +65,7 @@ impl ProfileRepository for PostgresProfileRepository {
                 description: r.description,
                 avatar_url: r.avatar_url,
                 github_login: r.github_login,
+                login_nonce: r.login_nonce,
                 created_at: r.created_at.unwrap(),
                 updated_at: r.updated_at.unwrap(),
             })
@@ -73,14 +75,15 @@ impl ProfileRepository for PostgresProfileRepository {
     async fn create(&self, profile: &Profile) -> Result<(), Box<dyn std::error::Error>> {
         sqlx::query!(
             r#"
-            INSERT INTO profiles (address, name, description, avatar_url, github_login, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO profiles (address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             "#,
             profile.address.as_str(),
             profile.name,
             profile.description,
             profile.avatar_url,
             profile.github_login,
+            profile.login_nonce,
             profile.created_at,
             profile.updated_at
         )
@@ -133,7 +136,7 @@ impl ProfileRepository for PostgresProfileRepository {
     ) -> Result<Option<Profile>, Box<dyn std::error::Error + Send + Sync>> {
         let row = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
             FROM profiles
             WHERE LOWER(github_login) = LOWER($1)
             "#,
@@ -149,8 +152,47 @@ impl ProfileRepository for PostgresProfileRepository {
             description: r.description,
             avatar_url: r.avatar_url,
             github_login: r.github_login,
+            login_nonce: r.login_nonce,
             created_at: r.created_at.unwrap(),
             updated_at: r.updated_at.unwrap(),
         }))
+    }
+
+    async fn get_login_nonce_by_wallet_address(
+        &self,
+        address: &WalletAddress,
+    ) -> Result<Option<i64>, Box<dyn std::error::Error>> {
+        let row = sqlx::query!(
+            r#"
+            SELECT login_nonce
+            FROM profiles
+            WHERE address = $1
+            "#,
+            address.as_str()
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+
+        Ok(row.map(|r| r.login_nonce))
+    }
+
+    async fn increment_login_nonce(
+        &self,
+        address: &WalletAddress,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        sqlx::query!(
+            r#"
+            UPDATE profiles
+            SET login_nonce = login_nonce + 1
+            WHERE address = $1
+            "#,
+            address.as_str()
+        )
+        .execute(&self.pool)
+        .await
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+
+        Ok(())
     }
 }

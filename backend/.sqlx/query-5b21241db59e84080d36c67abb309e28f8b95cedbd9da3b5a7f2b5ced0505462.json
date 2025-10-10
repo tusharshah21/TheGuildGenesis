@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT address, name, description, avatar_url, github_login, created_at, updated_at\n            FROM profiles\n            WHERE LOWER(github_login) = LOWER($1)\n            ",
+  "query": "\n            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at\n            FROM profiles\n            ",
   "describe": {
     "columns": [
       {
@@ -30,19 +30,22 @@
       },
       {
         "ordinal": 5,
+        "name": "login_nonce",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
     ],
     "parameters": {
-      "Left": [
-        "Text"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
@@ -50,9 +53,10 @@
       true,
       true,
       true,
+      false,
       true,
       true
     ]
   },
-  "hash": "177358fec702a5f78c1ff0dbd5eed42fa868487c84ebef42dfcf695e9ce42725"
+  "hash": "5b21241db59e84080d36c67abb309e28f8b95cedbd9da3b5a7f2b5ced0505462"
 }
