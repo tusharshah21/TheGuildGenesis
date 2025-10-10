@@ -24,7 +24,7 @@ impl ProfileRepository for PostgresProfileRepository {
     ) -> Result<Option<Profile>, Box<dyn std::error::Error>> {
         let row = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
             FROM profiles
             WHERE address = $1
             "#,
@@ -40,7 +40,7 @@ impl ProfileRepository for PostgresProfileRepository {
             description: r.description,
             avatar_url: r.avatar_url,
             github_login: r.github_login,
-            login_nonce: r.login_nonce,
+            login_nonce: 0, // Not needed for regular profile queries
             created_at: r.created_at.unwrap(),
             updated_at: r.updated_at.unwrap(),
         }))
@@ -49,7 +49,7 @@ impl ProfileRepository for PostgresProfileRepository {
     async fn find_all(&self) -> Result<Vec<Profile>, Box<dyn std::error::Error>> {
         let rows = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
             FROM profiles
             "#,
         )
@@ -65,7 +65,7 @@ impl ProfileRepository for PostgresProfileRepository {
                 description: r.description,
                 avatar_url: r.avatar_url,
                 github_login: r.github_login,
-                login_nonce: r.login_nonce,
+                login_nonce: 0, // Not needed for regular profile queries
                 created_at: r.created_at.unwrap(),
                 updated_at: r.updated_at.unwrap(),
             })
@@ -136,7 +136,7 @@ impl ProfileRepository for PostgresProfileRepository {
     ) -> Result<Option<Profile>, Box<dyn std::error::Error + Send + Sync>> {
         let row = sqlx::query!(
             r#"
-            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at
+            SELECT address, name, description, avatar_url, github_login, created_at, updated_at
             FROM profiles
             WHERE LOWER(github_login) = LOWER($1)
             "#,
@@ -152,7 +152,7 @@ impl ProfileRepository for PostgresProfileRepository {
             description: r.description,
             avatar_url: r.avatar_url,
             github_login: r.github_login,
-            login_nonce: r.login_nonce,
+            login_nonce: 0, // Not needed for regular profile queries
             created_at: r.created_at.unwrap(),
             updated_at: r.updated_at.unwrap(),
         }))
