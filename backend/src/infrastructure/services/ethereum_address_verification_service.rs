@@ -14,9 +14,7 @@ pub struct EthereumAddressVerificationService {
 
 impl EthereumAddressVerificationService {
     pub fn new(profile_repository: Arc<dyn ProfileRepository>) -> Self {
-        Self {
-            profile_repository,
-        }
+        Self { profile_repository }
     }
 }
 
@@ -28,7 +26,10 @@ impl AuthService for EthereumAddressVerificationService {
         signature: &str,
     ) -> Result<Option<AuthResult>, Box<dyn std::error::Error>> {
         // Create the message with the nonce
-        let message = format!("Sign this message to authenticate with The Guild.\n\nNonce: {}", challenge.nonce);
+        let message = format!(
+            "Sign this message to authenticate with The Guild.\n\nNonce: {}",
+            challenge.nonce
+        );
 
         // EIP-191 prefix + keccak256
         let msg_hash = hash_message(message);
@@ -47,9 +48,7 @@ impl AuthService for EthereumAddressVerificationService {
                 .increment_login_nonce(&wallet_address)
                 .await?;
 
-            Ok(Some(AuthResult {
-                wallet_address,
-            }))
+            Ok(Some(AuthResult { wallet_address }))
         } else {
             Ok(None)
         }

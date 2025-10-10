@@ -7,7 +7,7 @@ pub async fn get_login_nonce(
     address: String,
 ) -> Result<i64, String> {
     let wallet_address = WalletAddress(address);
-    
+
     match profile_repository
         .get_login_nonce_by_wallet_address(&wallet_address)
         .await
