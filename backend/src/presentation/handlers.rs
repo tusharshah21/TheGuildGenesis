@@ -7,12 +7,12 @@ use axum::{
 
 use crate::{
     application::{
-        commands::{
-            create_profile::create_profile, get_all_profiles::get_all_profiles,
-            get_profile::get_profile, update_profile::update_profile,
-        },
+        commands::{create_profile::create_profile, update_profile::update_profile},
         dtos::{CreateProfileRequest, NonceResponse, ProfileResponse, UpdateProfileRequest},
-        queries::get_login_nonce::get_login_nonce,
+        queries::{
+            get_all_profiles::get_all_profiles, get_login_nonce::get_login_nonce,
+            get_profile::get_profile,
+        },
     },
     domain::value_objects::WalletAddress,
 };

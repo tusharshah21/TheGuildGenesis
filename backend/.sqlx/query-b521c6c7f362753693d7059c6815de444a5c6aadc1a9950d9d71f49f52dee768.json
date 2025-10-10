@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT address, name, description, avatar_url, github_login, login_nonce, created_at, updated_at\n            FROM profiles\n            WHERE address = $1\n            ",
+  "query": "\n            SELECT address, name, description, avatar_url, github_login, created_at, updated_at\n            FROM profiles\n            ",
   "describe": {
     "columns": [
       {
@@ -30,24 +30,17 @@
       },
       {
         "ordinal": 5,
-        "name": "login_nonce",
-        "type_info": "Int8"
-      },
-      {
-        "ordinal": 6,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 7,
+        "ordinal": 6,
         "name": "updated_at",
         "type_info": "Timestamptz"
       }
     ],
     "parameters": {
-      "Left": [
-        "Text"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
@@ -55,10 +48,9 @@
       true,
       true,
       true,
-      false,
       true,
       true
     ]
   },
-  "hash": "d23893061ef0e487ff20489fc5f4640e73d70dde72e7412ca265b30db5ac4249"
+  "hash": "b521c6c7f362753693d7059c6815de444a5c6aadc1a9950d9d71f49f52dee768"
 }
