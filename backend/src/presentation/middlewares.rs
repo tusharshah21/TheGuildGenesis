@@ -50,7 +50,7 @@ pub async fn eth_auth_layer(
         .get_login_nonce_by_wallet_address(&wallet_address)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-        .ok_or(StatusCode::UNAUTHORIZED)?; // Profile must exist
+        .unwrap_or(1); // Use default nonce if profile doesn't exist
 
     let result = state
         .auth_service

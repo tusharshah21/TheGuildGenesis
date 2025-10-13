@@ -1,5 +1,5 @@
-import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { useAccount, useSignMessage } from "wagmi";
+import { useMutation, type UseMutationResult, useQueryClient } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
 import type {
   UpdateProfileInput,
   UpdateProfileResponse,
@@ -8,10 +8,9 @@ import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
 async function putUpdateProfile(
   address: string,
-  body: Omit<UpdateProfileInput, "siweMessage">,
+  body: UpdateProfileInput,
   signerAddress: string,
-  signature: string,
-  siweMessage: string
+  signature: string
 ): Promise<UpdateProfileResponse> {
   const response = await fetch(`${API_BASE_URL}/profiles/${address}`, {
     method: "PUT",
@@ -19,7 +18,6 @@ async function putUpdateProfile(
       "Content-Type": "application/json",
       "x-eth-address": signerAddress,
       "x-eth-signature": signature,
-      "x-siwe-message": siweMessage,
     },
     body: JSON.stringify(body),
   });
@@ -42,6 +40,7 @@ async function putUpdateProfile(
 
 type MutationVariables = {
   input: UpdateProfileInput;
+  signature: string;
 };
 
 export function useUpdateProfile(): UseMutationResult<
@@ -50,15 +49,17 @@ export function useUpdateProfile(): UseMutationResult<
   MutationVariables
 > {
   const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
 
   return useMutation<UpdateProfileResponse, Error, MutationVariables>({
     mutationKey: ["update-profile"],
-    mutationFn: async ({ input }) => {
+    mutationFn: async ({ input, signature }) => {
       if (!address) throw new Error("Wallet not connected");
-      const signature = await signMessageAsync({ message: input.siweMessage });
-      const { siweMessage, ...rest } = input;
-      return putUpdateProfile(address, rest, address, signature, siweMessage);
+      return putUpdateProfile(address, input, address, signature);
+    },
+    onSuccess: () => {
+      // Invalidate nonce query since it was incremented
+      queryClient.invalidateQueries({ queryKey: ["nonce", address] });
     },
   });
 }
