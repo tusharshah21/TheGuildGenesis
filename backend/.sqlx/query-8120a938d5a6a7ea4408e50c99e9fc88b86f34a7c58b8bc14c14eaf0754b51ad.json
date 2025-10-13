@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE profiles\n            SET login_nonce = login_nonce + 1, updated_at = NOW()\n            WHERE address = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8120a938d5a6a7ea4408e50c99e9fc88b86f34a7c58b8bc14c14eaf0754b51ad"
+}
