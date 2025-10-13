@@ -1,7 +1,6 @@
-import { useMutation, type UseMutationResult } from "@tanstack/react-query";
+import { useMutation, type UseMutationResult, useQueryClient } from "@tanstack/react-query";
 import { useAccount, useSignMessage } from "wagmi";
-import type { CreateProfileInput } from "@/lib/types/api";
-import type { CreateProfileResponse } from "@/lib/types/api";
+import type { CreateProfileInput, CreateProfileResponse } from "@/lib/types/api";
 import { API_BASE_URL } from "@/lib/constants/apiConstants";
 
 async function postCreateProfile(
@@ -15,7 +14,6 @@ async function postCreateProfile(
       "Content-Type": "application/json",
       "x-eth-address": address,
       "x-eth-signature": signature,
-      "x-siwe-message": input.siweMessage,
     },
     body: JSON.stringify(input),
   });
@@ -39,6 +37,7 @@ async function postCreateProfile(
 
 type MutationVariables = {
   input: CreateProfileInput;
+  signature: string;
 };
 
 export function useCreateProfile(): UseMutationResult<
@@ -48,15 +47,19 @@ export function useCreateProfile(): UseMutationResult<
 > {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
 
   return useMutation<CreateProfileResponse, Error, MutationVariables>({
     mutationKey: ["create-profile"],
-    mutationFn: async ({ input }) => {
+    mutationFn: async ({ input, signature }) => {
       if (!address) {
         throw new Error("Wallet not connected");
       }
-      const signature = await signMessageAsync({ message: input.siweMessage });
       return postCreateProfile(input, address, signature);
+    },
+    onSuccess: () => {
+      // Invalidate nonce query since it was incremented
+      queryClient.invalidateQueries({ queryKey: ["nonce", address] });
     },
   });
 }

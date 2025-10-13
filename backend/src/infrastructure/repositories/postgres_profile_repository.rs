@@ -184,7 +184,7 @@ impl ProfileRepository for PostgresProfileRepository {
         sqlx::query!(
             r#"
             UPDATE profiles
-            SET login_nonce = login_nonce + 1
+            SET login_nonce = login_nonce + 1, updated_at = NOW()
             WHERE address = $1
             "#,
             address.as_str()

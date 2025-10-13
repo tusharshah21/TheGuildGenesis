@@ -1,5 +1,5 @@
-import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { useAccount, useSignMessage } from "wagmi";
+import { useMutation, type UseMutationResult, useQueryClient } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
 import type {
   DeleteProfileInput,
   DeleteProfileResponse,
@@ -9,8 +9,7 @@ import { API_BASE_URL } from "@/lib/constants/apiConstants";
 async function deleteProfile(
   address: string,
   signerAddress: string,
-  signature: string,
-  siweMessage: string
+  signature: string
 ): Promise<DeleteProfileResponse> {
   const response = await fetch(`${API_BASE_URL}/profiles/${address}`, {
     method: "DELETE",
@@ -18,7 +17,6 @@ async function deleteProfile(
       "Content-Type": "application/json",
       "x-eth-address": signerAddress,
       "x-eth-signature": signature,
-      "x-siwe-message": siweMessage,
     },
   });
 
@@ -39,7 +37,7 @@ async function deleteProfile(
 }
 
 type MutationVariables = {
-  input: DeleteProfileInput;
+  signature: string;
 };
 
 export function useDeleteProfile(): UseMutationResult<
@@ -48,14 +46,17 @@ export function useDeleteProfile(): UseMutationResult<
   MutationVariables
 > {
   const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
 
   return useMutation<DeleteProfileResponse, Error, MutationVariables>({
     mutationKey: ["delete-profile"],
-    mutationFn: async ({ input }) => {
+    mutationFn: async ({ signature }) => {
       if (!address) throw new Error("Wallet not connected");
-      const signature = await signMessageAsync({ message: input.siweMessage });
-      return deleteProfile(address, address, signature, input.siweMessage);
+      return deleteProfile(address, address, signature);
+    },
+    onSuccess: () => {
+      // Invalidate nonce query since it was incremented
+      queryClient.invalidateQueries({ queryKey: ["nonce", address] });
     },
   });
 }
