@@ -7,6 +7,7 @@ import {AttestationRequestData, AttestationRequest} from "eas-contracts/IEAS.sol
 import {SchemaRegistry} from "eas-contracts/SchemaRegistry.sol";
 import {TheGuildActivityToken} from "../src/TheGuildActivityToken.sol";
 import {TheGuildBadgeRegistry} from "../src/TheGuildBadgeRegistry.sol";
+import {TheGuildBadgeRanking} from "../src/TheGuildBadgeRanking.sol";
 import {EASUtils} from "./utils/EASUtils.s.sol";
 import {console} from "forge-std/console.sol";
 
@@ -68,6 +69,19 @@ contract FullDeploymentScript is Script {
             // If already deployed with same salt + initCode, attach to the predicted address
             badgeRegistry = TheGuildBadgeRegistry(
                 0x8baA0d5135D241bd22a9eB35915300aCfB286307
+            );
+        }
+
+        // Deploy or attach to existing badge ranking via CREATE2
+        TheGuildBadgeRanking badgeRanking;
+        try new TheGuildBadgeRanking{salt: salt}(badgeRegistry) returns (
+            TheGuildBadgeRanking deployed
+        ) {
+            badgeRanking = deployed;
+        } catch {
+            // If already deployed with same salt + initCode, attach to the predicted address
+            badgeRanking = TheGuildBadgeRanking(
+                0x0000000000000000000000000000000000000000 // TODO: update with actual deployed address
             );
         }
 
