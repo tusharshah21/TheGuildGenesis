@@ -13,13 +13,12 @@ contract TheGuildBadgeRankingScript is Script {
             address(0x8aC95734e778322684f1D318fb7633777baa8427) // Amoy dev registry
         );
 
-        TheGuildBadgeRegistry badgeRegistry = TheGuildBadgeRegistry(badgeRegistryAddress);
-
         // Salt can be provided via env var or defaults to zero salt
         bytes32 salt = bytes32(vm.envOr("CREATE2_SALT", uint256(0)));
 
-        vm.startBroadcast();
-        new TheGuildBadgeRanking{salt: salt}(badgeRegistry);
+    vm.startBroadcast();
+    // Pass the address (cast to TheGuildBadgeRegistry)
+    new TheGuildBadgeRanking{salt: salt}(TheGuildBadgeRegistry(badgeRegistryAddress));
         vm.stopBroadcast();
     }
 }
