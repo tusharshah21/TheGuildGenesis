@@ -79,14 +79,9 @@ contract FullDeploymentScript is Script {
         ) {
             badgeRanking = deployed;
         } catch {
-            // If already deployed with same salt + initCode, attach to the predicted address
-            // Use environment variable to override or computed address on first deployment
-            badgeRanking = TheGuildBadgeRanking(
-                vm.envOr(
-                    "BADGE_RANKING_ADDRESS",
-                    address(0) // Will fail on catch if not set; set env var after first deployment
-                )
-            );
+            // If already deployed with same salt + initCode, attach to the predicted CREATE2 address
+            address predictedAddress = computeCreate2Address(salt, badgeRegistry);
+            badgeRanking = TheGuildBadgeRanking(predictedAddress);
         }
 
         // Create some attestations
@@ -106,5 +101,21 @@ contract FullDeploymentScript is Script {
         });
         eas.attest(request);
         vm.stopBroadcast();
+    }
+
+    function computeCreate2Address(bytes32 salt, TheGuildBadgeRegistry badgeRegistry) internal pure returns (address) {
+        // CREATE2 factory address
+        address factory = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
+
+        // Get the init code for TheGuildBadgeRanking(badgeRegistry)
+        bytes memory initCode = abi.encodePacked(
+            type(TheGuildBadgeRanking).creationCode,
+            abi.encode(badgeRegistry)
+        );
+
+        bytes32 initCodeHash = keccak256(initCode);
+        bytes32 data = keccak256(abi.encodePacked(bytes1(0xff), factory, salt, initCodeHash));
+
+        return address(uint160(uint256(data)));
     }
 }
