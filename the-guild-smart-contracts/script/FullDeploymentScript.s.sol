@@ -80,8 +80,12 @@ contract FullDeploymentScript is Script {
             badgeRanking = deployed;
         } catch {
             // If already deployed with same salt + initCode, attach to the predicted address
+            // Use environment variable to override or computed address on first deployment
             badgeRanking = TheGuildBadgeRanking(
-                0x0000000000000000000000000000000000000000 // TODO: update with actual deployed address
+                vm.envOr(
+                    "BADGE_RANKING_ADDRESS",
+                    address(0) // Will fail on catch if not set; set env var after first deployment
+                )
             );
         }
 
