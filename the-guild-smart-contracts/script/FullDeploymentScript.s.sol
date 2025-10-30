@@ -24,17 +24,7 @@ contract FullDeploymentScript is Script {
         vm.startBroadcast();
 
         // Deploy or attach to existing activity token via CREATE2
-        TheGuildActivityToken activityToken;
-        try new TheGuildActivityToken{salt: salt}(eas) returns (
-            TheGuildActivityToken deployed
-        ) {
-            activityToken = deployed;
-        } catch {
-            // If already deployed with same salt + initCode, attach to the predicted address
-            activityToken = TheGuildActivityToken(
-                payable(0x5a79Dd0F66E2C1203948dD49634E506b3D8723A0)
-            );
-        }
+        TheGuildActivityToken activityToken = new TheGuildActivityToken{salt: salt}(eas);
 
         // Register TheGuild Schema
         string memory schema = "bytes32 badgeName, bytes justification";
@@ -46,43 +36,24 @@ contract FullDeploymentScript is Script {
         console.logBytes32(schemaId);
 
         // Deploy or attach to existing badge registry via CREATE2
-        TheGuildBadgeRegistry badgeRegistry;
-        try new TheGuildBadgeRegistry{salt: salt}() returns (
-            TheGuildBadgeRegistry deployed
-        ) {
-            badgeRegistry = deployed;
+        TheGuildBadgeRegistry badgeRegistry = new TheGuildBadgeRegistry{salt: salt}();
 
-            // Create some badges
-            badgeRegistry.createBadge(
-                bytes32("Rust"),
-                bytes32("Know how to code in Rust")
-            );
-            badgeRegistry.createBadge(
-                bytes32("Solidity"),
-                bytes32("Know how to code in Solidity")
-            );
-            badgeRegistry.createBadge(
-                bytes32("TypeScript"),
-                bytes32("Know how to code in TypeScript")
-            );
-        } catch {
-            // If already deployed with same salt + initCode, attach to the predicted address
-            badgeRegistry = TheGuildBadgeRegistry(
-                0x8baA0d5135D241bd22a9eB35915300aCfB286307
-            );
-        }
+        // Create some badges
+        badgeRegistry.createBadge(
+            bytes32("Rust"),
+            bytes32("Know how to code in Rust")
+        );
+        badgeRegistry.createBadge(
+            bytes32("Solidity"),
+            bytes32("Know how to code in Solidity")
+        );
+        badgeRegistry.createBadge(
+            bytes32("TypeScript"),
+            bytes32("Know how to code in TypeScript")
+        );
 
         // Deploy or attach to existing badge ranking via CREATE2
-        TheGuildBadgeRanking badgeRanking;
-        try new TheGuildBadgeRanking{salt: salt}(badgeRegistry) returns (
-            TheGuildBadgeRanking deployed
-        ) {
-            badgeRanking = deployed;
-        } catch {
-            // If already deployed with same salt + initCode, attach to the predicted CREATE2 address
-            address predictedAddress = computeCreate2Address(salt, badgeRegistry);
-            badgeRanking = TheGuildBadgeRanking(predictedAddress);
-        }
+        TheGuildBadgeRanking badgeRanking = new TheGuildBadgeRanking{salt: salt}(badgeRegistry);
 
         // Create some attestations
         AttestationRequestData memory data = AttestationRequestData({
@@ -101,21 +72,5 @@ contract FullDeploymentScript is Script {
         });
         eas.attest(request);
         vm.stopBroadcast();
-    }
-
-    function computeCreate2Address(bytes32 salt, TheGuildBadgeRegistry badgeRegistry) internal pure returns (address) {
-        // CREATE2 factory address
-        address factory = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
-
-        // Get the init code for TheGuildBadgeRanking(badgeRegistry)
-        bytes memory initCode = abi.encodePacked(
-            type(TheGuildBadgeRanking).creationCode,
-            abi.encode(badgeRegistry)
-        );
-
-        bytes32 initCodeHash = keccak256(initCode);
-        bytes32 data = keccak256(abi.encodePacked(bytes1(0xff), factory, salt, initCodeHash));
-
-        return address(uint160(uint256(data)));
     }
 }
