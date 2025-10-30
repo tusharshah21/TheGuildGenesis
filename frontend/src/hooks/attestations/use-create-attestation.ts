@@ -69,7 +69,7 @@ export function useCreateAttestation() {
         );
       }
       isBusyRef.current = true;
-      // Convert strings to bytes32
+      // Convert strings to bytes
       const badgeNameBytes = stringToBytes32(badgeName);
       const justificationBytes = stringToBytes(justification);
 
