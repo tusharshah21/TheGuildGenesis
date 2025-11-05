@@ -203,6 +203,74 @@ forge script script/TheGuildBadgeRanking.s.sol:TheGuildBadgeRankingScript \
   --broadcast
 ```
 
+### Batch Attestations
+
+The `EmitAttestationsCsv.s.sol` script allows batch creation of attestations from CSV data using EAS's `multiAttest()` function for gas efficiency.
+
+#### CSV Format
+
+Prepare your CSV data in the following format:
+```csv
+address,badgeName,distributionId
+0x742d35Cc6634C0532925a3b844Bc454e4438f44e,Rust,dist-001
+0x742d35Cc6634C0532925a3b844Bc454e4438f44e,Solidity,dist-001
+```
+
+- `address`: Ethereum address of the recipient (checksum format preferred)
+- `badgeName`: Name of the badge to attest (will be converted to bytes32)
+- `distributionId`: Optional identifier for tracking the distribution batch
+
+#### Usage
+
+```shell
+# Using the helper script (recommended)
+export PRIVATE_KEY=your_private_key
+export RPC_URL=https://polygon-amoy.drpc.org
+
+# Dry run first
+./run_batch_attestations.sh attestations.csv true
+
+# Production run
+./run_batch_attestations.sh attestations.csv false
+
+# Manual approach
+# Load CSV data into environment variable
+export CSV_DATA=$(cat attestations.csv)
+
+# Set other environment variables
+export PRIVATE_KEY=your_private_key
+export SCHEMA_ID=0xb167f07504166f717f2a2710dbcfbfdf8fad6e8c6128c1a7fa80768f61b1d0b2
+
+# Dry run (recommended first)
+export DRY_RUN=true
+forge script script/EmitAttestationsCsv.s.sol:EmitAttestationsCsv \
+  --rpc-url <your_rpc_url>
+
+# Production run
+unset DRY_RUN
+forge script script/EmitAttestationsCsv.s.sol:EmitAttestationsCsv \
+  --rpc-url <your_rpc_url> \
+  --broadcast
+```
+
+#### Environment Variables
+
+For manual usage:
+- `PRIVATE_KEY`: Private key for transaction signing
+- `CSV_DATA`: CSV content as a string (load from file using `$(cat file.csv)`)
+- `SCHEMA_ID`: EAS schema ID to use (default: Amoy dev schema)
+- `DRY_RUN`: Set to `true` for validation without broadcasting (default: `false`)
+
+For helper script usage:
+- `PRIVATE_KEY`: Private key for transaction signing
+- `RPC_URL`: RPC endpoint URL for the target network
+
+The script will:
+1. Parse the CSV data from environment variable
+2. Create `MultiAttestationRequest` with all attestations
+3. Call EAS `multiAttest()` for gas-efficient batch processing
+4. Log all attestation UIDs upon completion
+
 ### Cast
 
 ```shell
