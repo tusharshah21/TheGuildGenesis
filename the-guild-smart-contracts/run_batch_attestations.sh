@@ -1,27 +1,27 @@
 #!/bin/bash
 
 # Helper script for running TheGuild batch attestation script
-# Usage: ./run_batch_attestations.sh <csv_file> [dry_run]
+# Usage: ./run_batch_attestations.sh <json_file> [dry_run]
 
 set -e
 
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <csv_file> [dry_run]"
-    echo "  csv_file: Path to CSV file with attestations"
+    echo "Usage: $0 <json_file> [dry_run]"
+    echo "  json_file: Path to JSON file with attestations"
     echo "  dry_run: Set to 'true' for dry run (default: false)"
     exit 1
 fi
 
-CSV_FILE="$1"
+JSON_FILE="$1"
 DRY_RUN="${2:-false}"
 
-if [ ! -f "$CSV_FILE" ]; then
-    echo "Error: CSV file '$CSV_FILE' not found"
+if [ ! -f "$JSON_FILE" ]; then
+    echo "Error: JSON file '$JSON_FILE' not found"
     exit 1
 fi
 
-# Load CSV data into environment variable
-export CSV_DATA=$(cat "$CSV_FILE")
+# Set JSON file path
+export JSON_PATH="$JSON_FILE"
 
 # Set dry run mode
 if [ "$DRY_RUN" = "true" ]; then

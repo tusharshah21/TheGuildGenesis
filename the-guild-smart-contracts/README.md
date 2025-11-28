@@ -205,20 +205,31 @@ forge script script/TheGuildBadgeRanking.s.sol:TheGuildBadgeRankingScript \
 
 ### Batch Attestations
 
-The `EmitAttestationsCsv.s.sol` script allows batch creation of attestations from CSV data using EAS's `multiAttest()` function for gas efficiency.
+The `EmitAttestationsCsv.s.sol` script allows batch creation of attestations from JSON data using EAS's `multiAttest()` function for gas efficiency.
 
-#### CSV Format
+#### JSON Format
 
-Prepare your CSV data in the following format:
-```csv
-address,badgeName,distributionId
-0x742d35Cc6634C0532925a3b844Bc454e4438f44e,Rust,dist-001
-0x742d35Cc6634C0532925a3b844Bc454e4438f44e,Solidity,dist-001
+Prepare your attestations data in JSON format:
+```json
+{
+  "attestations": [
+    {
+      "recipient": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "badgeName": "Rust",
+      "justification": "Outstanding Rust contributions to the project"
+    },
+    {
+      "recipient": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "badgeName": "Solidity",
+      "justification": "Excellent Solidity smart contract development"
+    }
+  ]
+}
 ```
 
-- `address`: Ethereum address of the recipient (checksum format preferred)
+- `recipient`: Ethereum address of the recipient
 - `badgeName`: Name of the badge to attest (will be converted to bytes32)
-- `distributionId`: Optional identifier for tracking the distribution batch
+- `justification`: Text explanation or link justifying the attestation
 
 #### Usage
 
@@ -228,18 +239,16 @@ export PRIVATE_KEY=your_private_key
 export RPC_URL=https://polygon-amoy.drpc.org
 
 # Dry run first
-./run_batch_attestations.sh attestations.csv true
+./run_batch_attestations.sh attestations.json true
 
 # Production run
-./run_batch_attestations.sh attestations.csv false
+./run_batch_attestations.sh attestations.json false
 
 # Manual approach
-# Load CSV data into environment variable
-export CSV_DATA=$(cat attestations.csv)
-
-# Set other environment variables
+# Set environment variables
 export PRIVATE_KEY=your_private_key
-export SCHEMA_ID=0xb167f07504166f717f2a2710dbcfbfdf8fad6e8c6128c1a7fa80768f61b1d0b2
+export JSON_PATH=./attestations.json
+export SCHEMA_ID=0xbcd7561083784f9b5a1c2b3ddb7aa9db263d43c58f7374cfa4875646824a47de
 
 # Dry run (recommended first)
 export DRY_RUN=true
@@ -255,21 +264,19 @@ forge script script/EmitAttestationsCsv.s.sol:EmitAttestationsCsv \
 
 #### Environment Variables
 
-For manual usage:
 - `PRIVATE_KEY`: Private key for transaction signing
-- `CSV_DATA`: CSV content as a string (load from file using `$(cat file.csv)`)
-- `SCHEMA_ID`: EAS schema ID to use (default: Amoy dev schema)
+- `JSON_PATH`: Path to the JSON file (default: `./attestations.json`)
+- `SCHEMA_ID`: EAS schema ID to use (default: Amoy production schema)
 - `DRY_RUN`: Set to `true` for validation without broadcasting (default: `false`)
-
-For helper script usage:
-- `PRIVATE_KEY`: Private key for transaction signing
-- `RPC_URL`: RPC endpoint URL for the target network
+- `EAS_ADDRESS`: EAS contract address (auto-detected for Amoy/Base Sepolia, required for other networks)
+- `RPC_URL`: RPC endpoint URL (for helper script)
 
 The script will:
-1. Parse the CSV data from environment variable
-2. Create `MultiAttestationRequest` with all attestations
-3. Call EAS `multiAttest()` for gas-efficient batch processing
-4. Log all attestation UIDs upon completion
+1. Read the JSON file directly using `vm.readFile()`
+2. Parse and validate all attestations
+3. Create `MultiAttestationRequest` batches (max 50 per batch)
+4. Call EAS `multiAttest()` for gas-efficient batch processing
+5. Log all attestation UIDs upon completion
 
 ### Cast
 
