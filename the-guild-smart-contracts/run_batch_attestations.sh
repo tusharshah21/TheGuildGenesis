@@ -5,6 +5,11 @@
 
 set -e
 
+# Source .env file if it exists
+if [ -f .env ]; then
+    source .env
+fi
+
 if [ $# -lt 1 ]; then
     echo "Usage: $0 <json_file> [dry_run]"
     echo "  json_file: Path to JSON file with attestations"

@@ -76,10 +76,27 @@ contract EmitAttestationsCsv is Script {
             bytes memory testPath = vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".recipient")));
             if (testPath.length == 0) break;  // No more attestations
             
+            // Parse badgeName with proper bytes32 conversion
+            string memory badgeNameStr = abi.decode(
+                vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".badgeName"))),
+                (string)
+            );
+            bytes32 badgeName;
+            bytes memory badgeNameBytes = bytes(badgeNameStr);
+            require(badgeNameBytes.length <= 32, "badgeName too long");
+            assembly {
+                badgeName := mload(add(badgeNameBytes, 32))
+            }
+            
+            bytes memory justification = abi.decode(
+                vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".justification"))),
+                (bytes)
+            );
+            
             tempAttestations[count] = AttestationData({
                 recipient: abi.decode(testPath, (address)),
-                badgeName: bytes32(abi.encodePacked(abi.decode(vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".badgeName"))), (string)))),
-                justification: abi.decode(vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".justification"))), (bytes))
+                badgeName: badgeName,
+                justification: justification
             });
             
             count++;
