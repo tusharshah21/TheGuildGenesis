@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, stdJson} from "forge-std/Script.sol";
 import {EAS} from "eas-contracts/EAS.sol";
 import {AttestationRequestData, MultiAttestationRequest} from "eas-contracts/IEAS.sol";
 import {EASUtils} from "./utils/EASUtils.s.sol";
 import {console} from "forge-std/console.sol";
 
 contract EmitAttestationsCsv is Script {
+    using stdJson for string;
+
     // Configuration constants
     uint256 constant MAX_BATCH_SIZE = 50; // Limit batch size to prevent gas issues
-    uint256 constant MAX_CSV_LINES = 1000; // Reasonable limit for CSV processing
+    uint256 constant MAX_ATTESTATIONS = 1000; // Reasonable limit for processing
 
     struct AttestationData {
         address recipient;
         bytes32 badgeName;
-        string distributionId;
         bytes justification;
     }
 
@@ -29,23 +30,17 @@ contract EmitAttestationsCsv is Script {
         EAS eas = EAS(EASUtils.getEASAddress(vm));
         console.log("EAS Address:", address(eas));
 
-        // Read and validate CSV from environment variable
-        string memory csvData = vm.envString("CSV_DATA");
-        console.log("Reading CSV data from environment variable");
-        
-        AttestationData[] memory attestations = parseAndValidateCsv(csvData);
+        // Read and validate JSON file
+        string memory jsonPath = vm.envOr("JSON_PATH", string("attestations.json"));
+        console.log("Reading JSON from:", jsonPath);
 
-        console.log(string(abi.encodePacked("Parsed ", vm.toString(attestations.length), " attestations from CSV")));
+        string memory jsonData = vm.readFile(jsonPath);
+        AttestationData[] memory attestations = parseAndValidateJson(jsonData);
 
-        // Validate distribution ID for idempotency (if provided)
-        string memory distributionId = getDistributionId(attestations);
-        if (bytes(distributionId).length > 0) {
-            console.log("Distribution ID:", distributionId);
-            // TODO: In production, check against on-chain storage for duplicates
-        }
+        console.log(string(abi.encodePacked("Parsed ", vm.toString(attestations.length), " attestations from JSON")));
 
         // Get schema ID
-        bytes32 schemaId = vm.envOr("SCHEMA_ID", bytes32(0xb167f07504166f717f2a2710dbcfbfdf8fad6e8c6128c1a7fa80768f61b1d0b2));
+        bytes32 schemaId = vm.envOr("SCHEMA_ID", bytes32(0xbcd7561083784f9b5a1c2b3ddb7aa9db263d43c58f7374cfa4875646824a47de));
         console.log("Using Schema ID:", vm.toString(schemaId));
 
         // Create batch requests
@@ -64,54 +59,52 @@ contract EmitAttestationsCsv is Script {
         executeAttestations(eas, requests);
     }
 
-    function parseAndValidateCsv(string memory csvData) internal pure returns (AttestationData[] memory) {
-        string[] memory lines = split(csvData, "\n");
-        require(lines.length >= 2, "CSV must have at least header + 1 data row");
-        require(lines.length <= MAX_CSV_LINES + 1, "CSV too large, max 1000 data rows allowed");
-
-        uint256 dataLines = lines.length - 1; // Skip header
-        AttestationData[] memory attestations = new AttestationData[](dataLines);
-
-        for (uint256 i = 1; i < lines.length; i++) {
-            if (bytes(lines[i]).length == 0) continue; // Skip empty lines
-
-            string[] memory fields = split(lines[i], ",");
-            require(fields.length >= 2, string(abi.encodePacked("Line ", vm.toString(i), ": must have at least address,badgeName")));
-
-            address recipient = parseAddress(fields[0]);
-            require(recipient != address(0), string(abi.encodePacked("Line ", vm.toString(i), ": invalid recipient address")));
-
-            bytes32 badgeName = parseBytes32(fields[1]);
-            require(badgeName != bytes32(0), string(abi.encodePacked("Line ", vm.toString(i), ": badgeName cannot be empty")));
-
-            string memory distributionId = fields.length >= 3 ? fields[2] : "";
-
-            bytes memory justification = bytes(distributionId).length > 0
-                ? abi.encodePacked("Distribution: ", distributionId)
-                : bytes("Batch attestation");
-
-            attestations[i-1] = AttestationData({
-                recipient: recipient,
-                badgeName: badgeName,
-                distributionId: distributionId,
-                justification: justification
+    function parseAndValidateJson(string memory jsonData) internal view returns (AttestationData[] memory) {
+        // JSON parseJson returns data with types inferred from JSON - addresses as address, strings as string
+        console.log("Parsing JSON attestations array...");
+        
+        // Count attestations - parse the full array to get length
+        // We'll use a temporary storage to collect attestations
+        AttestationData[] memory tempAttestations = new AttestationData[](MAX_ATTESTATIONS);
+        uint256 count = 0;
+        
+        // Parse attestations until we run out
+        for (uint256 i = 0; i < MAX_ATTESTATIONS; i++) {
+            string memory basePath = string(abi.encodePacked(".attestations[", vm.toString(i), "]"));
+            
+            // Try to parse this attestation - if it doesn't exist, parseJson will revert
+            bytes memory testPath = vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".recipient")));
+            if (testPath.length == 0) break;  // No more attestations
+            
+            tempAttestations[count] = AttestationData({
+                recipient: abi.decode(testPath, (address)),
+                badgeName: bytes32(abi.encodePacked(abi.decode(vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".badgeName"))), (string)))),
+                justification: abi.decode(vm.parseJson(jsonData, string(abi.encodePacked(basePath, ".justification"))), (bytes))
             });
+            
+            count++;
+        }
+        
+        // Copy to properly sized array
+        AttestationData[] memory attestations = new AttestationData[](count);
+        for (uint256 i = 0; i < count; i++) {
+            attestations[i] = tempAttestations[i];
+        }
+        
+        console.log("Found", attestations.length, "attestations in JSON");
+
+        require(attestations.length > 0, "JSON must contain at least 1 attestation");
+        require(attestations.length <= MAX_ATTESTATIONS, "Too many attestations, max 1000 allowed");
+
+        // Validate each attestation
+        for (uint256 i = 0; i < attestations.length; i++) {
+            require(attestations[i].recipient != address(0), 
+                    string(abi.encodePacked("Attestation ", vm.toString(i), ": invalid recipient address")));
+            require(attestations[i].badgeName != bytes32(0), 
+                    string(abi.encodePacked("Attestation ", vm.toString(i), ": badgeName cannot be empty")));
         }
 
         return attestations;
-    }
-
-    function getDistributionId(AttestationData[] memory attestations) internal pure returns (string memory) {
-        if (attestations.length == 0) return "";
-
-        string memory firstId = attestations[0].distributionId;
-        for (uint256 i = 1; i < attestations.length; i++) {
-            require(
-                keccak256(bytes(attestations[i].distributionId)) == keccak256(bytes(firstId)),
-                "All attestations must have the same distributionId"
-            );
-        }
-        return firstId;
     }
 
     function createBatchRequests(
@@ -189,62 +182,4 @@ contract EmitAttestationsCsv is Script {
     }
 
 
-    // Helper function to parse address from string
-    function parseAddress(string memory addrStr) public pure returns (address) {
-        bytes memory addrBytes = bytes(addrStr);
-        require(addrBytes.length == 42, "Invalid address length"); // 0x + 40 hex chars
-        require(addrBytes[0] == '0' && (addrBytes[1] == 'x' || addrBytes[1] == 'X'), "Address must start with 0x");
-
-        uint160 addr;
-        for (uint256 i = 2; i < 42; i++) {
-            uint8 digit;
-            if (uint8(addrBytes[i]) >= 48 && uint8(addrBytes[i]) <= 57) {
-                digit = uint8(addrBytes[i]) - 48;
-            } else if (uint8(addrBytes[i]) >= 65 && uint8(addrBytes[i]) <= 70) {
-                digit = uint8(addrBytes[i]) - 55;
-            } else if (uint8(addrBytes[i]) >= 97 && uint8(addrBytes[i]) <= 102) {
-                digit = uint8(addrBytes[i]) - 87;
-            } else {
-                revert("Invalid hex character in address");
-            }
-            addr = addr * 16 + digit;
-        }
-        return address(addr);
-    }
-
-    // Helper function to parse bytes32 from string
-    function parseBytes32(string memory str) public pure returns (bytes32) {
-        return bytes32(abi.encodePacked(str));
-    }
-
-    // Simple string splitting function
-    function split(string memory str, string memory delimiter) public pure returns (string[] memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory delimBytes = bytes(delimiter);
-
-        uint256 count = 1;
-        for (uint256 i = 0; i < strBytes.length; i++) {
-            if (strBytes[i] == delimBytes[0]) {
-                count++;
-            }
-        }
-
-        string[] memory result = new string[](count);
-        uint256 lastIndex = 0;
-        uint256 resultIndex = 0;
-
-        for (uint256 i = 0; i <= strBytes.length; i++) {
-            if (i == strBytes.length || strBytes[i] == delimBytes[0]) {
-                bytes memory slice = new bytes(i - lastIndex);
-                for (uint256 j = 0; j < slice.length; j++) {
-                    slice[j] = strBytes[lastIndex + j];
-                }
-                result[resultIndex] = string(slice);
-                resultIndex++;
-                lastIndex = i + 1;
-            }
-        }
-
-        return result;
-    }
 }
