@@ -38,8 +38,7 @@ pub async fn eth_auth_layer(
             if let Some(token) = auth_str.strip_prefix("Bearer ") {
                 let jwt_manager = JwtManager::new();
                 if let Ok(claims) = jwt_manager.validate_token(token) {
-                    req.extensions_mut()
-                        .insert(VerifiedWallet(claims.address));
+                    req.extensions_mut().insert(VerifiedWallet(claims.address));
                     return Ok(next.run(req).await);
                 }
             }
